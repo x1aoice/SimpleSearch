@@ -1,6 +1,10 @@
 :root {
-  --font-size: clamp(34px, 4.8vw, 76px);
-  --container-width: 1120px;
+  --font-size: 56px;
+  --container-width: 920px;
+  --panel-width: 920px;
+  --settings-width: 920px;
+  --control-height: 36px;
+  --radius: 6px;
   --flash-color: #1a1a1a;
   --bg: #ffffff;
   --text: #1a1a1a;
@@ -54,7 +58,7 @@ body.departing {
 
 .shell {
   min-height: 100dvh;
-  padding-top: 30vh;
+  padding: 28dvh 40px 0;
 }
 
 form {
@@ -66,8 +70,8 @@ form {
 
 .input-wrapper {
   position: relative;
-  width: min(86vw, var(--container-width));
-  height: clamp(118px, 13vw, 168px);
+  width: min(100%, var(--container-width));
+  height: 136px;
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -100,7 +104,7 @@ form {
   z-index: 2;
   width: 100%;
   height: 100%;
-  padding-right: 72px;
+  padding-right: 80px;
   outline: none;
   background: transparent;
   color: var(--text);
@@ -112,7 +116,7 @@ form {
   left: 0;
   top: 50%;
   z-index: 3;
-  width: 16px;
+  width: 14px;
   height: 1.1em;
   border-radius: 0;
   background: var(--caret-color);
@@ -122,23 +126,6 @@ form {
   transform-origin: left center;
   transition: transform 0.1s cubic-bezier(0.25, 1.5, 0.5, 1), background-color 0.2s, opacity 0.5s ease;
   will-change: transform;
-}
-
-.ghost-text {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  z-index: 1;
-  max-width: 52%;
-  overflow: hidden;
-  color: var(--ghost);
-  font-style: italic;
-  opacity: 0.68;
-  pointer-events: none;
-  text-overflow: ellipsis;
-  transform: translate(0, -50%);
-  transition: transform 0.1s cubic-bezier(0.25, 1.5, 0.5, 1);
-  white-space: pre;
 }
 
 .measure {
@@ -153,12 +140,14 @@ form {
 .panel {
   position: fixed;
   left: 50%;
-  bottom: 32px;
+  bottom: clamp(32px, 6vh, 72px);
   z-index: 10;
-  width: min(860px, calc(100vw - 64px));
-  padding: 20px 22px 22px;
+  width: min(var(--panel-width), calc(100vw - 80px));
+  max-height: calc(100dvh - 160px);
+  overflow: auto;
+  padding: 22px 24px 24px;
   border: 1px solid var(--surface-border);
-  border-radius: 8px;
+  border-radius: 7px;
   background: var(--surface);
   box-shadow: 0 22px 70px rgba(15, 23, 42, 0.18);
   color: var(--text);
@@ -170,15 +159,6 @@ form {
   display: none;
 }
 
-.panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  margin-bottom: 18px;
-}
-
-.panel-header h1,
 .help-content h2 {
   margin: 0;
   font-size: 14px;
@@ -188,13 +168,13 @@ form {
 
 .help-content {
   display: grid;
-  grid-template-columns: 1.15fr 1fr 1.2fr;
-  gap: 28px;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr) minmax(0, 1.1fr);
+  gap: 30px;
 }
 
 .help-list {
   display: grid;
-  grid-template-columns: minmax(92px, auto) 1fr;
+  grid-template-columns: minmax(88px, max-content) minmax(0, 1fr);
   gap: 9px 14px;
   margin: 14px 0 0;
   font-size: 13px;
@@ -214,12 +194,12 @@ form {
 }
 
 .settings-panel {
-  width: min(760px, calc(100vw - 64px));
+  width: min(var(--settings-width), calc(100vw - 80px));
 }
 
 .settings-content {
   display: grid;
-  gap: 22px;
+  gap: 24px;
 }
 
 .settings-group {
@@ -253,7 +233,6 @@ form {
   text-align: right;
 }
 
-.choice-grid,
 .choice-row {
   display: flex;
   flex-wrap: wrap;
@@ -262,10 +241,10 @@ form {
 
 .choice-button {
   min-width: 74px;
-  height: 34px;
+  height: var(--control-height);
   padding: 0 12px;
   border: 1px solid var(--surface-border);
-  border-radius: 6px;
+  border-radius: var(--radius);
   background: transparent;
   color: var(--muted);
   cursor: pointer;
@@ -275,15 +254,16 @@ form {
 }
 
 .choice-button:hover,
-.choice-button.active {
+.choice-button.active,
+.choice-button:focus-visible {
   border-color: var(--text);
   color: var(--text);
 }
 
 .custom-engine-form {
   display: grid;
-  grid-template-columns: 86px 140px minmax(220px, 1fr) 86px 64px;
-  gap: 8px;
+  grid-template-columns: 82px 132px minmax(300px, 1fr) 96px 70px;
+  gap: 10px;
   align-items: end;
 }
 
@@ -302,9 +282,9 @@ form {
 
 .custom-engine-form input {
   width: 100%;
-  height: 34px;
+  height: var(--control-height);
   border: 1px solid var(--surface-border);
-  border-radius: 6px;
+  border-radius: var(--radius);
   outline: none;
   background: var(--field-bg);
   color: var(--text);
@@ -346,23 +326,23 @@ form {
 .custom-engine-empty {
   display: flex;
   align-items: center;
-  min-height: 40px;
-  padding: 0 10px;
+  min-height: 42px;
+  padding: 0 12px;
   border: 1px dashed var(--surface-border);
-  border-radius: 6px;
+  border-radius: var(--radius);
   color: var(--muted);
   font-size: 13px;
 }
 
 .custom-engine-row {
   display: grid;
-  grid-template-columns: 86px 140px 86px 1fr 54px 34px;
-  gap: 8px;
+  grid-template-columns: 82px 132px 96px minmax(0, 1fr) 56px 36px;
+  gap: 10px;
   align-items: center;
-  min-height: 40px;
-  padding: 0 0 0 10px;
+  min-height: 42px;
+  padding: 0 0 0 12px;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: var(--radius);
   background: var(--field-bg);
   color: var(--muted);
   font-size: 13px;
@@ -399,23 +379,6 @@ form {
 .delete-engine-button {
   min-width: 34px;
   padding: 0;
-}
-
-.icon-button {
-  width: 28px;
-  height: 28px;
-  border: 0;
-  border-radius: 4px;
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
-  font: inherit;
-  font-size: 22px;
-  line-height: 1;
-}
-
-.icon-button:hover {
-  color: var(--text);
 }
 
 .blink {
@@ -484,26 +447,45 @@ form {
 
 @media (min-width: 1800px) {
   :root {
-    --font-size: clamp(48px, 3vw, 92px);
-    --container-width: 1440px;
+    --font-size: 72px;
+    --container-width: 1160px;
+    --panel-width: 1040px;
+    --settings-width: 1040px;
   }
 
   .idle-caret {
-    width: 22px;
+    width: 18px;
+  }
+}
+
+@media (max-width: 980px) {
+  .panel,
+  .settings-panel {
+    width: calc(100vw - 48px);
+  }
+
+  .custom-engine-form {
+    grid-template-columns: 76px 112px minmax(220px, 1fr) 86px 68px;
+    gap: 8px;
+  }
+
+  .custom-engine-row {
+    grid-template-columns: 76px 112px 86px minmax(0, 1fr) 54px 34px;
+    gap: 8px;
   }
 }
 
 @media (max-height: 560px) {
   .shell {
-    padding-top: 16vh;
+    padding-top: 14dvh;
   }
 
   .input-wrapper {
-    height: clamp(76px, 16vh, 118px);
+    height: 96px;
   }
 
   :root {
-    --font-size: clamp(28px, 8vh, 54px);
+    --font-size: 42px;
   }
 }
 

@@ -3,7 +3,7 @@ export const SEARCH_ENGINES = {
     b: { label: 'Baidu', action: 'https://www.baidu.com/s', param: 'wd', color: '#2932E1' },
     bi: { label: 'Bing', action: 'https://www.bing.com/search', param: 'q', color: '#00809d' },
     gh: { label: 'GitHub', action: 'https://github.com/search', param: 'q', color: '#A371F7' },
-    ddg: { label: 'DuckDuckGo', action: 'https://duckduckgo.com/', param: 'q', color: '#de5833' },
+    dg: { label: 'DuckDuckGo', action: 'https://duckduckgo.com/', param: 'q', color: '#de5833' },
 };
 
 export const THEME_OPTIONS = [
@@ -33,6 +33,5 @@ export const COMMAND_HELP = [
 export const SHORTCUT_HELP = [
     { keys: 'Enter', description: '搜索，或直接打开 URL/IP' },
     { keys: 'Shift+Enter', description: '强制搜索当前输入' },
-    { keys: 'Tab', description: '接受计算结果' },
     { keys: 'Esc', description: '清空输入或关闭面板' },
 ];

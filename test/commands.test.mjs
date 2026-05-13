@@ -7,7 +7,7 @@ test('resolves search engine commands', () => {
     assert.equal(result.type, 'engine');
     assert.equal(result.engine.label, 'Baidu');
 
-    const duckDuckGo = resolveCommand('ddg');
+    const duckDuckGo = resolveCommand('dg');
     assert.equal(duckDuckGo.type, 'engine');
     assert.equal(duckDuckGo.engine.label, 'DuckDuckGo');
 });

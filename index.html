@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="A minimalist desktop search launcher with commands and calculator hints.">
+  <meta name="description" content="A minimalist desktop search launcher with commands and custom search engines.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="styles.css">
   <title>SimpleSearch</title>
@@ -16,17 +16,12 @@
       <div class="input-wrapper">
         <div id="measure" class="measure typo"></div>
         <div class="idle-caret"></div>
-        <div id="ghost" class="ghost-text typo" aria-hidden="true"></div>
         <input id="q" type="text" name="q" class="typo" autofocus autocomplete="off" spellcheck="false" aria-label="搜索">
       </div>
     </form>
   </main>
 
   <section id="help-panel" class="panel help-panel" aria-label="帮助" hidden>
-    <div class="panel-header">
-      <h1>SimpleSearch</h1>
-      <button id="help-close" class="icon-button" type="button" aria-label="关闭帮助">x</button>
-    </div>
     <div class="help-content">
       <div>
         <h2>搜索引擎</h2>
@@ -44,15 +39,7 @@
   </section>
 
   <section id="settings-panel" class="panel settings-panel" aria-label="设置" hidden>
-    <div class="panel-header">
-      <h1>设置</h1>
-      <button id="settings-close" class="icon-button" type="button" aria-label="关闭设置">x</button>
-    </div>
     <div class="settings-content">
-      <section class="settings-group">
-        <h2>搜索引擎</h2>
-        <div id="settings-engines" class="choice-grid"></div>
-      </section>
       <section class="settings-group">
         <h2>主题</h2>
         <div id="settings-themes" class="choice-row"></div>
@@ -65,15 +52,15 @@
         <form id="custom-engine-form" class="custom-engine-form" autocomplete="off">
           <label>
             <span>命令</span>
-            <input id="custom-engine-key" type="text" maxlength="16" spellcheck="false" autocomplete="off" placeholder="mdn">
+            <input id="custom-engine-key" type="text" maxlength="16" spellcheck="false" autocomplete="off" placeholder="site">
           </label>
           <label>
             <span>名称</span>
-            <input id="custom-engine-label" type="text" maxlength="32" spellcheck="false" autocomplete="off" placeholder="MDN">
+            <input id="custom-engine-label" type="text" maxlength="32" spellcheck="false" autocomplete="off" placeholder="搜索">
           </label>
           <label class="template-field">
             <span>URL（用 %s 代替搜索字词）</span>
-            <input id="custom-engine-template" type="text" maxlength="2048" spellcheck="false" autocomplete="off" placeholder="developer.mozilla.org/search?q=%s">
+            <input id="custom-engine-template" type="text" maxlength="2048" spellcheck="false" autocomplete="off" placeholder="https://search.example.com?q=%s">
           </label>
           <label class="color-field">
             <span>颜色</span>

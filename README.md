@@ -7,10 +7,9 @@ SimpleSearch is a minimalist desktop search launcher. It keeps the page quiet: t
 - Multi-engine search with slash commands.
 - Direct URL, domain, IP, and localhost navigation.
 - `Shift+Enter` to force search when an IP or domain should be searched instead of opened.
-- Inline calculator for simple arithmetic.
 - System, light, and dark themes.
 - Built-in `/help` panel.
-- Built-in `/settings` panel for default engine and theme.
+- Built-in `/settings` panel for theme and custom search engines.
 - Custom search engines with `%s` URL templates, editing, and deletion.
 
 ## Commands
@@ -23,7 +22,7 @@ Type a command and press Space.
 | `/b` | Baidu |
 | `/bi` | Bing |
 | `/gh` | GitHub |
-| `/ddg` | DuckDuckGo |
+| `/dg` | DuckDuckGo |
 | `/dark` | Dark theme |
 | `/light` | Light theme |
 | `/help` | Open help |
@@ -56,7 +55,6 @@ Use the edit button in settings to update a custom engine's name, URL, or flash 
 | --- | --- |
 | Enter | Search or open a detected URL/IP |
 | Shift+Enter | Force search the current input |
-| Tab | Accept a calculator result |
 | Esc | Clear input or close help |
 
 ## Project Structure
@@ -69,14 +67,12 @@ SimpleSearch/
 ├─ favicon.svg
 ├─ src/
 │  ├─ app.js
-│  ├─ calculator.js
 │  ├─ commands.js
 │  ├─ config.js
 │  ├─ custom-engines.js
 │  ├─ storage.js
 │  └─ url.js
 └─ test/
-   ├─ calculator.test.mjs
    ├─ commands.test.mjs
    ├─ custom-engines.test.mjs
    ├─ source-text.test.mjs

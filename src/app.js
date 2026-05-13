@@ -16,7 +16,6 @@ import {
     toEngineMap,
     validateCustomEngine,
 } from './custom-engines.js';
-import { tryCalculate } from './calculator.js';
 import { getSearchTarget, getURLTarget } from './url.js';
 import { safeGetItem, safeRemoveItem, safeSetItem } from './storage.js';
 
@@ -24,16 +23,12 @@ const inputElement = document.getElementById('q');
 const formElement = document.getElementById('search-form');
 const caretElement = document.querySelector('.idle-caret');
 const measureElement = document.getElementById('measure');
-const ghostElement = document.getElementById('ghost');
 const inputWrapper = document.querySelector('.input-wrapper');
 const helpPanel = document.getElementById('help-panel');
-const helpCloseButton = document.getElementById('help-close');
 const settingsPanel = document.getElementById('settings-panel');
-const settingsCloseButton = document.getElementById('settings-close');
 const engineHelpElement = document.getElementById('engine-help');
 const commandHelpElement = document.getElementById('command-help');
 const shortcutHelpElement = document.getElementById('shortcut-help');
-const settingsEnginesElement = document.getElementById('settings-engines');
 const settingsThemesElement = document.getElementById('settings-themes');
 const customEngineForm = document.getElementById('custom-engine-form');
 const customEngineKeyInput = document.getElementById('custom-engine-key');
@@ -52,7 +47,6 @@ let searchEngines = toEngineMap(customEngines);
 let currentEngine = searchEngines[currentEngineKey];
 let currentTheme = DEFAULT_THEME;
 let editingCustomEngineKey = '';
-let calculatorResult = null;
 let blinkTimer = null;
 let jumpTimer = null;
 
@@ -62,11 +56,6 @@ function syncMeasureStyles() {
     measureElement.style.letterSpacing = computedStyle.letterSpacing;
     measureElement.style.fontVariantLigatures = computedStyle.fontVariantLigatures;
     measureElement.style.lineHeight = computedStyle.lineHeight;
-}
-
-function getGhostText() {
-    if (calculatorResult !== null) return `= ${calculatorResult}`;
-    return '';
 }
 
 function updateUI() {
@@ -80,10 +69,6 @@ function updateUI() {
     const clampedPosition = Math.max(0, Math.min(caretPosition, wrapperWidth - 18));
 
     caretElement.style.transform = `translate(${clampedPosition}px, -50%) scale(1.3, 0.85)`;
-
-    const ghostText = getGhostText();
-    ghostElement.textContent = ghostText;
-    ghostElement.style.transform = `translate(${ghostText ? clampedPosition + 25 : 0}px, -50%)`;
 
     caretElement.classList.remove('blink');
     caretElement.style.opacity = 1;
@@ -102,7 +87,6 @@ function updateUI() {
 function resetInputState() {
     inputElement.value = '';
     inputElement.scrollLeft = 0;
-    calculatorResult = null;
     updateUI();
 }
 
@@ -140,9 +124,6 @@ function createChoiceButton(label, value, group) {
 }
 
 function renderSettings() {
-    settingsEnginesElement.replaceChildren(
-        ...Object.entries(searchEngines).map(([key, engine]) => createChoiceButton(engine.label, key, 'engine')),
-    );
     settingsThemesElement.replaceChildren(
         ...THEME_OPTIONS.map(theme => createChoiceButton(theme.label, theme.key, 'theme')),
     );
@@ -196,10 +177,6 @@ function renderCustomEngines() {
 }
 
 function updateSettingsState() {
-    for (const button of settingsEnginesElement.querySelectorAll('.choice-button')) {
-        button.classList.toggle('active', button.dataset.engine === currentEngineKey);
-    }
-
     for (const button of settingsThemesElement.querySelectorAll('.choice-button')) {
         button.classList.toggle('active', button.dataset.theme === currentTheme);
     }
@@ -231,7 +208,6 @@ function setSearchEngine(key, savePreference = true, animate = true) {
     inputElement.name = engine.param || 'q';
     document.body.style.setProperty('--flash-color', engine.color);
     resetInputState();
-    updateSettingsState();
 
     if (savePreference) {
         safeSetItem(localStorage, STORAGE_KEYS.engine, key);
@@ -240,7 +216,6 @@ function setSearchEngine(key, savePreference = true, animate = true) {
     if (!animate) return;
 
     caretElement.style.transition = 'none';
-    ghostElement.style.transition = 'none';
     updateUI();
 
     caretElement.classList.remove('blink', 'flash-brand');
@@ -250,7 +225,6 @@ function setSearchEngine(key, savePreference = true, animate = true) {
     setTimeout(() => {
         caretElement.classList.remove('flash-brand');
         caretElement.style.transition = 'transform 0.1s cubic-bezier(0.25, 1.5, 0.5, 1), background-color 0.2s, opacity 0.5s ease';
-        ghostElement.style.transition = 'transform 0.1s cubic-bezier(0.25, 1.5, 0.5, 1)';
         caretElement.classList.add('blink');
     }, 500);
 }
@@ -425,7 +399,6 @@ function navigateFromInput(forceSearch = false) {
 }
 
 inputElement.addEventListener('input', () => {
-    calculatorResult = tryCalculate(inputElement.value);
     triggerRecoil();
     updateUI();
 });
@@ -457,14 +430,6 @@ inputElement.addEventListener('keydown', event => {
         updateUI();
         return;
     }
-
-    if (event.key === 'Tab' && calculatorResult !== null) {
-        event.preventDefault();
-        inputElement.value = String(calculatorResult);
-        calculatorResult = null;
-        updateUI();
-        return;
-    }
 });
 
 formElement.addEventListener('submit', event => {
@@ -485,14 +450,6 @@ window.addEventListener('resize', () => {
 inputElement.addEventListener('scroll', updateUI);
 inputElement.addEventListener('focus', updateUI);
 inputWrapper.addEventListener('animationend', () => inputWrapper.classList.remove('shake'));
-helpCloseButton.addEventListener('click', hidePanels);
-settingsCloseButton.addEventListener('click', hidePanels);
-settingsEnginesElement.addEventListener('click', event => {
-    const button = event.target.closest('[data-engine]');
-    if (!button) return;
-    setSearchEngine(button.dataset.engine);
-    inputElement.focus();
-});
 settingsThemesElement.addEventListener('click', event => {
     const button = event.target.closest('[data-theme]');
     if (!button) return;
@@ -521,6 +478,7 @@ customEngineListElement.addEventListener('click', event => {
 
 document.addEventListener('click', event => {
     if (helpPanel.contains(event.target) || settingsPanel.contains(event.target)) return;
+    if (!helpPanel.hidden || !settingsPanel.hidden) hidePanels();
     inputElement.focus();
 });
 
