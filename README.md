@@ -36,7 +36,7 @@ Slash text is still searchable. For example, `/b` + Enter searches `/b`; only `/
 
 ## Custom Search Engines
 
-Open `/settings`, then add a command, name, and URL template. The URL must include `%s`.
+Open `/settings`, then add a command, name, and URL template. The URL must include `%s`. If the protocol is omitted, SimpleSearch saves it with `https://`.
 
 ```text
 Command: mdn

@@ -10,6 +10,7 @@ const RESERVED_COMMANDS = new Set([
     'set',
     'settings',
 ]);
+const TEMPLATE_PROTOCOL_PATTERN = /^([a-z][a-z0-9+.-]*):\/\//i;
 
 export function loadCustomEngines(storage = window.localStorage) {
     try {
@@ -42,7 +43,8 @@ export function toEngineMap(customEngines) {
 export function validateCustomEngine(input, existingEngines = [], editingKey = '') {
     const key = input.key.trim().toLowerCase();
     const label = input.label.trim();
-    const template = input.template.trim();
+    const rawTemplate = input.template.trim();
+    const template = normalizeTemplate(rawTemplate);
 
     if (!/^[a-z0-9]{1,16}$/.test(key)) {
         return { ok: false, message: '命令只能使用 1-16 个小写字母或数字。' };
@@ -60,8 +62,12 @@ export function validateCustomEngine(input, existingEngines = [], editingKey = '
         return { ok: false, message: '名称需要 1-32 个字符。' };
     }
 
-    if (!/^https?:\/\//i.test(template)) {
-        return { ok: false, message: 'URL 需要以 http:// 或 https:// 开头。' };
+    if (!rawTemplate) {
+        return { ok: false, message: 'URL 需要包含 %s。' };
+    }
+
+    if (!isHttpTemplate(template)) {
+        return { ok: false, message: 'URL 只支持 http:// 或 https://。' };
     }
 
     if (!template.includes('%s')) {
@@ -83,6 +89,15 @@ export function validateCustomEngine(input, existingEngines = [], editingKey = '
             color: '#111111',
         },
     };
+}
+
+function normalizeTemplate(template) {
+    if (!template || TEMPLATE_PROTOCOL_PATTERN.test(template)) return template;
+    return `https://${template}`;
+}
+
+function isHttpTemplate(template) {
+    return /^https?:\/\//i.test(template);
 }
 
 function normalizeCustomEngine(engine) {

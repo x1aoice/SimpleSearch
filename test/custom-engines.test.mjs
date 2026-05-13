@@ -31,6 +31,17 @@ test('validates a custom search engine', () => {
     assert.equal(result.engine.key, 'mdn');
 });
 
+test('adds https to a custom engine URL without a protocol', () => {
+    const result = validateCustomEngine({
+        key: 'mdn',
+        label: 'MDN',
+        template: 'developer.mozilla.org/search?q=%s',
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.engine.template, 'https://developer.mozilla.org/search?q=%s');
+});
+
 test('rejects reserved, duplicate, and invalid engines', () => {
     assert.equal(validateCustomEngine({
         key: 'g',
@@ -47,6 +58,11 @@ test('rejects reserved, duplicate, and invalid engines', () => {
         label: 'MDN',
         template: 'https://developer.mozilla.org/search?q=%s',
     }, [{ key: 'mdn' }]).ok, false);
+    assert.equal(validateCustomEngine({
+        key: 'ftp',
+        label: 'FTP',
+        template: 'ftp://example.com/search?q=%s',
+    }).ok, false);
 });
 
 test('allows editing the same custom engine command', () => {
