@@ -293,7 +293,12 @@ function getURLTarget(input) {
         return SAFE_PROTOCOLS.has(protocolMatch[1].toLowerCase()) ? trimmed : null;
     }
 
-    return isValidURL(trimmed) ? `https://${trimmed}` : null;
+    if (!isValidURL(trimmed)) return null;
+
+    const host = trimmed.split('/')[0].replace(/:\d{2,5}$/, '').toLowerCase();
+    const isLocalTarget = host === 'localhost' || /^(\d{1,3}\.){3}\d{1,3}$/.test(host);
+
+    return `${isLocalTarget ? 'http' : 'https'}://${trimmed}`;
 }
 
 // Search Engine & Theme
@@ -342,6 +347,35 @@ function setTheme(theme, savePreference = true) {
     setTimeout(updateUI, 50);
 }
 
+function resetInputState() {
+    inputElement.value = '';
+    inputElement.scrollLeft = 0;
+    calculatorResult = null;
+    historyIndex = -1;
+    updateUI();
+}
+
+function runCommand(command) {
+    if (SEARCH_ENGINES[command]) {
+        setSearchEngine(SEARCH_ENGINES[command], command);
+        return true;
+    }
+
+    if (command === 'dark') {
+        setTheme('dark');
+        resetInputState();
+        return true;
+    }
+
+    if (command === 'light') {
+        setTheme('light');
+        resetInputState();
+        return true;
+    }
+
+    return false;
+}
+
 // Animations
 
 function triggerShake() {
@@ -369,24 +403,13 @@ inputElement.addEventListener('input', () => {
 inputElement.addEventListener('keydown', (event) => {
     const value = inputElement.value;
 
+    // Commands only run when the user finishes a slash command with Space.
+    // Pressing Enter always treats the current text as a normal search.
     if (event.key === ' ' && value.startsWith('/')) {
         const command = value.slice(1).toLowerCase();
 
-        if (SEARCH_ENGINES[command]) {
+        if (runCommand(command)) {
             event.preventDefault();
-            setSearchEngine(SEARCH_ENGINES[command], command);
-            return;
-        }
-
-        if (command === 'dark') {
-            event.preventDefault();
-            setTheme('dark');
-            return;
-        }
-
-        if (command === 'light') {
-            event.preventDefault();
-            setTheme('light');
             return;
         }
     }
@@ -424,13 +447,6 @@ inputElement.addEventListener('keydown', (event) => {
         }
     }
 
-    if (event.key === 'Enter') {
-        const trimmed = value.trim();
-        if (trimmed.startsWith('/') && !trimmed.includes(' ')) {
-            event.preventDefault();
-            triggerShake();
-        }
-    }
 });
 
 formElement.addEventListener('submit', (event) => {
@@ -438,12 +454,6 @@ formElement.addEventListener('submit', (event) => {
 
     if (!value) {
         event.preventDefault();
-        return;
-    }
-
-    if (value.startsWith('/') && !value.includes(' ')) {
-        event.preventDefault();
-        triggerShake();
         return;
     }
 
