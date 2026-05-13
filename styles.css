@@ -282,7 +282,7 @@ form {
 
 .custom-engine-form {
   display: grid;
-  grid-template-columns: 86px 140px minmax(220px, 1fr) 64px;
+  grid-template-columns: 86px 140px minmax(220px, 1fr) 54px 64px;
   gap: 8px;
   align-items: end;
 }
@@ -316,6 +316,20 @@ form {
 
 .custom-engine-form input::placeholder {
   color: var(--ghost);
+}
+
+.custom-engine-form input[type="color"] {
+  padding: 3px;
+  cursor: pointer;
+}
+
+.custom-engine-form input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.custom-engine-form input[type="color"]::-webkit-color-swatch {
+  border: 0;
+  border-radius: 4px;
 }
 
 .custom-engine-form input:focus {
@@ -356,7 +370,7 @@ form {
 
 .custom-engine-row {
   display: grid;
-  grid-template-columns: 86px 140px 1fr 54px 34px;
+  grid-template-columns: 86px 140px 22px 1fr 54px 34px;
   gap: 8px;
   align-items: center;
   min-height: 40px;
@@ -382,6 +396,15 @@ form {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.custom-engine-swatch {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--surface-border);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--field-bg);
 }
 
 .cancel-engine-button {

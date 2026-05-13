@@ -11,6 +11,7 @@ test('keeps Chinese UI text readable in source files', async () => {
 
     assert.match(html, /aria-label="搜索"/);
     assert.match(html, /URL（用 %s 代替搜索字词）/);
+    assert.match(html, />颜色</);
     assert.match(app, /textContent = '编辑'/);
     assert.match(app, /textContent = '添加'/);
     assert.doesNotMatch(source, /鎼滅储|缂栬緫|鍒犻櫎|娣诲姞|淇濆瓨/);

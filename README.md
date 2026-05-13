@@ -50,7 +50,7 @@ Then use it like:
 /mdn array map
 ```
 
-Use the edit button in settings to update a custom engine's name or URL. Delete removes it from the local configuration.
+Use the edit button in settings to update a custom engine's name, URL, or flash color. Delete removes it from the local configuration.
 
 ## Shortcuts
 

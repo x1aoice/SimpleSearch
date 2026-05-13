@@ -11,7 +11,9 @@ const RESERVED_COMMANDS = new Set([
     'settings',
 ]);
 export const CUSTOM_ENGINE_TEMPLATE_MAX_LENGTH = 2048;
+export const DEFAULT_CUSTOM_ENGINE_COLOR = '#111111';
 const TEMPLATE_PROTOCOL_PATTERN = /^([a-z][a-z0-9+.-]*):\/\//i;
+const COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 
 export function loadCustomEngines(storage = window.localStorage) {
     try {
@@ -46,6 +48,7 @@ export function validateCustomEngine(input, existingEngines = [], editingKey = '
     const label = input.label.trim();
     const rawTemplate = input.template.trim();
     const template = normalizeTemplate(rawTemplate);
+    const color = String(input.color ?? DEFAULT_CUSTOM_ENGINE_COLOR).trim();
 
     if (!/^[a-z0-9]{1,16}$/.test(key)) {
         return { ok: false, message: '命令只能使用 1-16 个小写字母或数字。' };
@@ -68,6 +71,7 @@ export function validateCustomEngine(input, existingEngines = [], editingKey = '
     if (!isHttpTemplate(template)) return { ok: false, message: 'URL 只支持 http:// 或 https://。' };
     if (!template.includes('%s')) return { ok: false, message: 'URL 中用 %s 代替搜索字词。' };
     if (!isValidTemplateURL(template)) return { ok: false, message: 'URL 格式无效。' };
+    if (!isValidColor(color)) return { ok: false, message: '颜色格式无效。' };
 
     return {
         ok: true,
@@ -75,7 +79,7 @@ export function validateCustomEngine(input, existingEngines = [], editingKey = '
             key,
             label,
             template,
-            color: '#111111',
+            color: color.toLowerCase(),
         },
     };
 }
@@ -98,6 +102,10 @@ function isValidTemplateURL(template) {
     }
 }
 
+function isValidColor(color) {
+    return COLOR_PATTERN.test(color);
+}
+
 function normalizeCustomEngine(engine) {
     if (!engine || typeof engine !== 'object') return null;
 
@@ -106,6 +114,7 @@ function normalizeCustomEngine(engine) {
             key: String(engine.key ?? ''),
             label: String(engine.label ?? ''),
             template: String(engine.template ?? ''),
+            color: String(engine.color ?? DEFAULT_CUSTOM_ENGINE_COLOR),
         },
         [],
     );

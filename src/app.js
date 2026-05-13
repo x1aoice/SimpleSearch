@@ -10,6 +10,7 @@ import {
 } from './config.js';
 import { resolveCommand } from './commands.js';
 import {
+    DEFAULT_CUSTOM_ENGINE_COLOR,
     loadCustomEngines,
     saveCustomEngines,
     toEngineMap,
@@ -38,6 +39,7 @@ const customEngineForm = document.getElementById('custom-engine-form');
 const customEngineKeyInput = document.getElementById('custom-engine-key');
 const customEngineLabelInput = document.getElementById('custom-engine-label');
 const customEngineTemplateInput = document.getElementById('custom-engine-template');
+const customEngineColorInput = document.getElementById('custom-engine-color');
 const customEngineSubmitButton = document.getElementById('custom-engine-submit');
 const customEngineCancelButton = document.getElementById('custom-engine-cancel');
 const customEngineStateElement = document.getElementById('custom-engine-state');
@@ -162,6 +164,7 @@ function renderCustomEngines() {
             const row = document.createElement('div');
             const key = document.createElement('strong');
             const label = document.createElement('span');
+            const color = document.createElement('span');
             const template = document.createElement('span');
             const editButton = document.createElement('button');
             const deleteButton = document.createElement('button');
@@ -170,6 +173,9 @@ function renderCustomEngines() {
             row.classList.toggle('editing', engine.key === editingCustomEngineKey);
             key.textContent = `/${engine.key}`;
             label.textContent = engine.label;
+            color.className = 'custom-engine-swatch';
+            color.style.backgroundColor = engine.color;
+            color.title = engine.color;
             template.textContent = engine.template;
             template.title = engine.template;
             editButton.className = 'choice-button edit-engine-button';
@@ -183,7 +189,7 @@ function renderCustomEngines() {
             deleteButton.ariaLabel = `删除 ${engine.label}`;
             deleteButton.textContent = '×';
 
-            row.append(key, label, template, editButton, deleteButton);
+            row.append(key, label, color, template, editButton, deleteButton);
             return row;
         }),
     );
@@ -328,6 +334,7 @@ function executeCommand(command) {
 function resetCustomEngineForm() {
     editingCustomEngineKey = '';
     customEngineForm.reset();
+    customEngineColorInput.value = DEFAULT_CUSTOM_ENGINE_COLOR;
     customEngineForm.classList.remove('editing');
     customEngineKeyInput.disabled = false;
     customEngineSubmitButton.textContent = '添加';
@@ -345,6 +352,7 @@ function editCustomEngine(key) {
     customEngineKeyInput.value = engine.key;
     customEngineLabelInput.value = engine.label;
     customEngineTemplateInput.value = engine.template;
+    customEngineColorInput.value = engine.color;
     customEngineForm.classList.add('editing');
     customEngineSubmitButton.textContent = '保存';
     customEngineCancelButton.hidden = false;
@@ -360,6 +368,7 @@ function saveCustomEngine() {
             key: customEngineKeyInput.value,
             label: customEngineLabelInput.value,
             template: customEngineTemplateInput.value,
+            color: customEngineColorInput.value,
         },
         customEngines,
         editingCustomEngineKey,
