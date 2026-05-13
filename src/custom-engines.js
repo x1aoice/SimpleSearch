@@ -10,6 +10,7 @@ const RESERVED_COMMANDS = new Set([
     'set',
     'settings',
 ]);
+export const CUSTOM_ENGINE_TEMPLATE_MAX_LENGTH = 2048;
 const TEMPLATE_PROTOCOL_PATTERN = /^([a-z][a-z0-9+.-]*):\/\//i;
 
 export function loadCustomEngines(storage = window.localStorage) {
@@ -63,6 +64,7 @@ export function validateCustomEngine(input, existingEngines = [], editingKey = '
     }
 
     if (!rawTemplate) return { ok: false, message: 'URL 不能为空。' };
+    if (template.length > CUSTOM_ENGINE_TEMPLATE_MAX_LENGTH) return { ok: false, message: `URL 不能超过 ${CUSTOM_ENGINE_TEMPLATE_MAX_LENGTH} 个字符。` };
     if (!isHttpTemplate(template)) return { ok: false, message: 'URL 只支持 http:// 或 https://。' };
     if (!template.includes('%s')) return { ok: false, message: 'URL 中用 %s 代替搜索字词。' };
     if (!isValidTemplateURL(template)) return { ok: false, message: 'URL 格式无效。' };

@@ -57,25 +57,28 @@
         <h2>主题</h2>
         <div id="settings-themes" class="choice-row"></div>
       </section>
-      <section class="settings-group">
-        <h2>自定义搜索引擎</h2>
+      <section class="settings-group custom-engine-section">
+        <div class="settings-group-header">
+          <h2>自定义搜索引擎</h2>
+          <p id="custom-engine-state" class="custom-engine-state" aria-live="polite"></p>
+        </div>
         <form id="custom-engine-form" class="custom-engine-form" autocomplete="off">
           <label>
             <span>命令</span>
-            <input id="custom-engine-key" type="text" maxlength="16" spellcheck="false" autocomplete="off">
+            <input id="custom-engine-key" type="text" maxlength="16" spellcheck="false" autocomplete="off" placeholder="mdn">
           </label>
           <label>
             <span>名称</span>
-            <input id="custom-engine-label" type="text" maxlength="32" spellcheck="false" autocomplete="off">
+            <input id="custom-engine-label" type="text" maxlength="32" spellcheck="false" autocomplete="off" placeholder="MDN">
           </label>
           <label class="template-field">
             <span>URL（用 %s 代替搜索字词）</span>
-            <input id="custom-engine-template" type="text" spellcheck="false" autocomplete="off">
+            <input id="custom-engine-template" type="text" maxlength="2048" spellcheck="false" autocomplete="off" placeholder="developer.mozilla.org/search?q=%s">
           </label>
           <button id="custom-engine-submit" class="choice-button add-engine-button" type="submit">添加</button>
         </form>
         <button id="custom-engine-cancel" class="choice-button cancel-engine-button" type="button" hidden>取消编辑</button>
-        <div id="custom-engine-error" class="custom-engine-error" aria-live="polite"></div>
+        <div id="custom-engine-error" class="custom-engine-error" aria-live="polite" role="alert"></div>
         <div id="custom-engine-list" class="custom-engine-list"></div>
       </section>
     </div>

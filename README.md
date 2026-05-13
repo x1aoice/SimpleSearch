@@ -65,6 +65,7 @@ Use the edit button in settings to update a custom engine's name or URL. Delete 
 
 ```text
 SimpleSearch/
+├─ .editorconfig
 ├─ index.html
 ├─ styles.css
 ├─ favicon.svg
@@ -73,12 +74,14 @@ SimpleSearch/
 │  ├─ calculator.js
 │  ├─ commands.js
 │  ├─ config.js
+│  ├─ custom-engines.js
 │  ├─ storage.js
 │  └─ url.js
 └─ test/
    ├─ calculator.test.mjs
    ├─ commands.test.mjs
    ├─ custom-engines.test.mjs
+   ├─ source-text.test.mjs
    └─ url.test.mjs
 ```
 

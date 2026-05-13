@@ -29,4 +29,8 @@ test('builds search URLs from the selected engine', () => {
         getSearchTarget({ template: 'https://developer.mozilla.org/search?q=%s' }, 'array map'),
         'https://developer.mozilla.org/search?q=array%20map',
     );
+    assert.equal(
+        getSearchTarget({ template: 'https://example.com/search/%s?q=%s' }, 'array map'),
+        'https://example.com/search/array%20map?q=array%20map',
+    );
 });

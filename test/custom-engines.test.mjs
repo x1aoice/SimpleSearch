@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+    CUSTOM_ENGINE_TEMPLATE_MAX_LENGTH,
     loadCustomEngines,
     toEngineMap,
     validateCustomEngine,
@@ -40,6 +41,23 @@ test('adds https to a custom engine URL without a protocol', () => {
 
     assert.equal(result.ok, true);
     assert.equal(result.engine.template, 'https://developer.mozilla.org/search?q=%s');
+});
+
+test('limits custom engine URL length', () => {
+    const baseTemplate = 'https://example.com/search?q=%s&pad=';
+    const exactTemplate = `${baseTemplate}${'a'.repeat(CUSTOM_ENGINE_TEMPLATE_MAX_LENGTH - baseTemplate.length)}`;
+
+    assert.equal(exactTemplate.length, CUSTOM_ENGINE_TEMPLATE_MAX_LENGTH);
+    assert.equal(validateCustomEngine({
+        key: 'exact',
+        label: 'Exact URL',
+        template: exactTemplate,
+    }).ok, true);
+    assert.equal(validateCustomEngine({
+        key: 'long',
+        label: 'Long URL',
+        template: `${exactTemplate}a`,
+    }).ok, false);
 });
 
 test('rejects reserved, duplicate, and invalid engines', () => {

@@ -40,6 +40,7 @@ const customEngineLabelInput = document.getElementById('custom-engine-label');
 const customEngineTemplateInput = document.getElementById('custom-engine-template');
 const customEngineSubmitButton = document.getElementById('custom-engine-submit');
 const customEngineCancelButton = document.getElementById('custom-engine-cancel');
+const customEngineStateElement = document.getElementById('custom-engine-state');
 const customEngineErrorElement = document.getElementById('custom-engine-error');
 const customEngineListElement = document.getElementById('custom-engine-list');
 
@@ -148,6 +149,14 @@ function renderSettings() {
 }
 
 function renderCustomEngines() {
+    if (!customEngines.length) {
+        const emptyState = document.createElement('div');
+        emptyState.className = 'custom-engine-empty';
+        emptyState.textContent = '还没有自定义搜索引擎';
+        customEngineListElement.replaceChildren(emptyState);
+        return;
+    }
+
     customEngineListElement.replaceChildren(
         ...customEngines.map(engine => {
             const row = document.createElement('div');
@@ -158,9 +167,11 @@ function renderCustomEngines() {
             const deleteButton = document.createElement('button');
 
             row.className = 'custom-engine-row';
+            row.classList.toggle('editing', engine.key === editingCustomEngineKey);
             key.textContent = `/${engine.key}`;
             label.textContent = engine.label;
             template.textContent = engine.template;
+            template.title = engine.template;
             editButton.className = 'choice-button edit-engine-button';
             editButton.type = 'button';
             editButton.dataset.editEngine = engine.key;
@@ -170,7 +181,7 @@ function renderCustomEngines() {
             deleteButton.type = 'button';
             deleteButton.dataset.deleteEngine = engine.key;
             deleteButton.ariaLabel = `删除 ${engine.label}`;
-            deleteButton.textContent = 'x';
+            deleteButton.textContent = '×';
 
             row.append(key, label, template, editButton, deleteButton);
             return row;
@@ -317,10 +328,13 @@ function executeCommand(command) {
 function resetCustomEngineForm() {
     editingCustomEngineKey = '';
     customEngineForm.reset();
+    customEngineForm.classList.remove('editing');
     customEngineKeyInput.disabled = false;
     customEngineSubmitButton.textContent = '添加';
     customEngineCancelButton.hidden = true;
+    customEngineStateElement.textContent = '';
     customEngineErrorElement.textContent = '';
+    renderCustomEngines();
 }
 
 function editCustomEngine(key) {
@@ -331,9 +345,12 @@ function editCustomEngine(key) {
     customEngineKeyInput.value = engine.key;
     customEngineLabelInput.value = engine.label;
     customEngineTemplateInput.value = engine.template;
+    customEngineForm.classList.add('editing');
     customEngineSubmitButton.textContent = '保存';
     customEngineCancelButton.hidden = false;
+    customEngineStateElement.textContent = `正在编辑 /${engine.key}`;
     customEngineErrorElement.textContent = '';
+    renderCustomEngines();
     customEngineKeyInput.focus();
 }
 

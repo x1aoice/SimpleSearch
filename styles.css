@@ -8,6 +8,8 @@
   --ghost: #a0a0a0;
   --surface: rgba(255, 255, 255, 0.92);
   --surface-border: rgba(15, 23, 42, 0.12);
+  --field-bg: rgba(15, 23, 42, 0.025);
+  --danger: #b42318;
   --caret-color: #1a1a1a;
   --glow: rgba(0, 0, 0, 0.05);
 }
@@ -19,6 +21,8 @@ body.dark {
   --ghost: #63636b;
   --surface: rgba(18, 18, 22, 0.94);
   --surface-border: rgba(255, 255, 255, 0.14);
+  --field-bg: rgba(255, 255, 255, 0.035);
+  --danger: #ff8a80;
   --caret-color: #f0f0f0;
   --glow: rgba(255, 255, 255, 0.15);
 }
@@ -229,6 +233,26 @@ form {
   letter-spacing: 0;
 }
 
+.settings-group-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.settings-group-header h2 {
+  margin: 0;
+}
+
+.custom-engine-state {
+  min-height: 18px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: right;
+}
+
 .choice-grid,
 .choice-row {
   display: flex;
@@ -258,7 +282,7 @@ form {
 
 .custom-engine-form {
   display: grid;
-  grid-template-columns: 86px 140px 1fr 64px;
+  grid-template-columns: 86px 140px minmax(220px, 1fr) 64px;
   gap: 8px;
   align-items: end;
 }
@@ -271,6 +295,9 @@ form {
 .custom-engine-form span {
   color: var(--muted);
   font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .custom-engine-form input {
@@ -279,12 +306,16 @@ form {
   border: 1px solid var(--surface-border);
   border-radius: 6px;
   outline: none;
-  background: transparent;
+  background: var(--field-bg);
   color: var(--text);
   font: inherit;
   font-size: 13px;
   letter-spacing: 0;
   padding: 0 10px;
+}
+
+.custom-engine-form input::placeholder {
+  color: var(--ghost);
 }
 
 .custom-engine-form input:focus {
@@ -298,7 +329,7 @@ form {
 .custom-engine-error {
   min-height: 18px;
   margin-top: 8px;
-  color: var(--muted);
+  color: var(--danger);
   font-size: 12px;
 }
 
@@ -312,13 +343,34 @@ form {
   margin-top: 10px;
 }
 
+.custom-engine-empty {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px dashed var(--surface-border);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .custom-engine-row {
   display: grid;
   grid-template-columns: 86px 140px 1fr 54px 34px;
   gap: 8px;
   align-items: center;
+  min-height: 40px;
+  padding: 0 0 0 10px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: var(--field-bg);
   color: var(--muted);
   font-size: 13px;
+}
+
+.custom-engine-row.editing {
+  border-color: var(--text);
+  color: var(--text);
 }
 
 .custom-engine-row strong {
@@ -457,6 +509,8 @@ form {
     --ghost: #63636b;
     --surface: rgba(18, 18, 22, 0.94);
     --surface-border: rgba(255, 255, 255, 0.14);
+    --field-bg: rgba(255, 255, 255, 0.035);
+    --danger: #ff8a80;
     --caret-color: #f0f0f0;
     --glow: rgba(255, 255, 255, 0.15);
   }
