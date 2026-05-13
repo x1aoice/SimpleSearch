@@ -1,0 +1,471 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Minimalist Search & Calculator">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>SimpleSearch</title>
+  <style>
+    :root {
+      --font-size: clamp(28px, 4vw + 1vh, 72px);
+      --container-width: 1000px;
+      --flash-color: #1a1a1a
+    }
+
+    body {
+      --bg: #ffffff;
+      --text: #1a1a1a;
+      --caret-color: #1a1a1a;
+      --ghost: #a0a0a0;
+      --glow: rgba(0, 0, 0, 0.05);
+      margin: 0;
+      min-height: 100dvh;
+      min-width: 320px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding-top: 32vh;
+      background: var(--bg);
+      font-family: "Menlo", "Monaco", "Consolas", "Courier New", "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", monospace;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow: hidden;
+      opacity: 1;
+      transform: scale(1);
+      transition: background .5s ease, opacity .4s ease, transform .4s cubic-bezier(0.2, 0, 0, 1)
+    }
+
+    body.dark {
+      --bg: #09090b;
+      --text: #f0f0f0;
+      --caret-color: #f0f0f0;
+      --ghost: #555555;
+      --glow: rgba(255, 255, 255, 0.15)
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body.departing {
+      opacity: 0;
+      transform: scale(0.96);
+      pointer-events: none
+    }
+
+    form {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      z-index: 1
+    }
+
+    .input-wrapper {
+      position: relative;
+      width: min(90vw, var(--container-width));
+      height: clamp(120px, 18vw, 160px);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      font-size: var(--font-size);
+      transform-origin: center;
+      transition: transform .05s ease-out
+    }
+
+    .recoil {
+      transform: scale(0.995)
+    }
+
+    .typo {
+      font-family: inherit;
+      font-size: inherit;
+      line-height: normal;
+      letter-spacing: 0;
+      font-variant-ligatures: none;
+      font-weight: 500;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      text-shadow: 0 0 30px var(--glow);
+      transition: text-shadow .3s ease
+    }
+
+    input[type="text"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      color: var(--text);
+      outline: none;
+      caret-color: transparent;
+      z-index: 2;
+      padding: 0;
+      padding-right: 60px
+    }
+
+    .idle-caret {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translate(0, -50%) scale(1);
+      width: 16px;
+      height: 1.1em;
+      background: var(--caret-color);
+      pointer-events: none;
+      z-index: 3;
+      border-radius: 0;
+      transform-origin: left center;
+      transition: transform .1s cubic-bezier(0.25, 1.5, 0.5, 1), background-color .2s, opacity .5s ease;
+      will-change: transform;
+      box-shadow: 0 0 20px var(--glow)
+    }
+
+    .ghost-text {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translate(0, -50%);
+      color: var(--ghost);
+      pointer-events: none;
+      white-space: pre;
+      z-index: 1;
+      transition: transform .1s cubic-bezier(0.25, 1.5, 0.5, 1);
+      font-style: italic;
+      opacity: 0.6
+    }
+
+    .measure {
+      position: absolute;
+      visibility: hidden;
+      white-space: pre;
+      pointer-events: none;
+      top: 0;
+      left: 0
+    }
+
+    @media (min-width:1440px) {
+      :root {
+        --font-size: clamp(36px, 3.5vw, 80px);
+        --container-width: 1200px
+      }
+
+      .idle-caret {
+        width: 18px
+      }
+    }
+
+    @media (max-width:1439px) and (min-width:1025px) {
+      :root {
+        --font-size: clamp(28px, 4vw + 0.5vh, 68px)
+      }
+
+      body {
+        padding-top: 30vh
+      }
+    }
+
+    @media (max-width:1024px) {
+      :root {
+        --font-size: clamp(24px, 4.5vw + 0.5vh, 64px)
+      }
+
+      body {
+        padding-top: 26vh
+      }
+
+      .input-wrapper {
+        height: clamp(100px, 18vw, 140px)
+      }
+
+      .idle-caret {
+        width: 14px
+      }
+    }
+
+    @media (max-width:767px) and (min-width:641px) {
+      :root {
+        --font-size: clamp(22px, 5.5vw + 0.5vh, 56px)
+      }
+
+      body {
+        padding-top: 24vh;
+        padding-inline: 20px
+      }
+
+      .input-wrapper {
+        height: clamp(90px, 16vw, 130px);
+        width: 100%
+      }
+    }
+
+    @media (max-width:640px) {
+      :root {
+        --font-size: clamp(20px, 7vw + 0.5vh, 52px)
+      }
+
+      body {
+        padding-top: 20vh;
+        padding-inline: 16px
+      }
+
+      .input-wrapper {
+        height: clamp(80px, 20vw, 120px);
+        width: 100%
+      }
+
+      .idle-caret {
+        width: 12px
+      }
+
+      input[type="text"] {
+        padding-right: 40px
+      }
+    }
+
+    @media (max-width:479px) {
+      :root {
+        --font-size: clamp(18px, 8vw, 44px)
+      }
+
+      body {
+        padding-top: 18vh;
+        padding-inline: 12px
+      }
+
+      .input-wrapper {
+        height: clamp(70px, 22vw, 100px)
+      }
+
+      .idle-caret {
+        width: 10px;
+        height: 1em
+      }
+
+      input[type="text"] {
+        padding-right: 30px
+      }
+    }
+
+    @media (max-width:319px) {
+      :root {
+        --font-size: 16px
+      }
+
+      body {
+        min-width: 280px;
+        padding-top: 15vh;
+        padding-inline: 8px
+      }
+
+      .input-wrapper {
+        height: 60px
+      }
+
+      .idle-caret {
+        width: 8px
+      }
+    }
+
+    @media (max-height:540px) and (orientation:landscape) {
+      body {
+        padding-top: 14vh
+      }
+
+      .input-wrapper {
+        height: clamp(60px, 18vh, 100px)
+      }
+
+      :root {
+        --font-size: clamp(20px, 8vh, 48px)
+      }
+    }
+
+    @media (max-height:400px) {
+      body {
+        padding-top: 10vh
+      }
+
+      .input-wrapper {
+        height: clamp(50px, 15vh, 80px)
+      }
+
+      :root {
+        --font-size: clamp(16px, 6vh, 36px)
+      }
+    }
+
+    @media (hover:none) and (pointer:coarse) {
+      .input-wrapper {
+        min-height: 60px
+      }
+
+      input[type="text"] {
+        font-size: max(16px, var(--font-size))
+      }
+
+      .idle-caret {
+        transition: transform .05s ease-out, background-color .2s
+      }
+    }
+
+    @media (-webkit-min-device-pixel-ratio:2),
+    (min-resolution:192dpi) {
+      .idle-caret {
+        box-shadow: 0 0 25px var(--glow)
+      }
+    }
+
+    @media (min-width:2560px) {
+      :root {
+        --font-size: clamp(48px, 2.5vw, 96px);
+        --container-width: 1600px
+      }
+
+      .idle-caret {
+        width: 24px
+      }
+
+      body {
+        padding-top: 35vh
+      }
+
+      .input-wrapper {
+        height: clamp(160px, 12vw, 220px)
+      }
+    }
+
+    @media (prefers-color-scheme:dark) {
+      body:not(.light-forced) {
+        --bg: #09090b;
+        --text: #f0f0f0;
+        --caret-color: #f0f0f0;
+        --ghost: #555555;
+        --glow: rgba(255, 255, 255, 0.15)
+      }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important
+      }
+
+      .idle-caret {
+        transition: none
+      }
+
+      body {
+        transition: background .01ms
+      }
+    }
+
+    @media (prefers-contrast:high) {
+      :root {
+        --ghost: #666666
+      }
+
+      body {
+        --text: #000000;
+        --caret-color: #000000
+      }
+
+      body.dark {
+        --text: #ffffff;
+        --caret-color: #ffffff;
+        --ghost: #999999
+      }
+
+      .idle-caret {
+        box-shadow: none
+      }
+    }
+
+    .blink {
+      animation: blink 1s steps(1) infinite
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0
+      }
+    }
+
+    .flash-brand {
+      animation: flash-color .5s ease forwards
+    }
+
+    @keyframes flash-color {
+      0% {
+        background: var(--caret-color);
+        transform: translate(0, -50%) scale(1)
+      }
+
+      30% {
+        background: var(--flash-color);
+        box-shadow: 0 0 50px var(--flash-color);
+        transform: translate(0, -50%) scale(1.4, 0.8)
+      }
+
+      100% {
+        background: var(--caret-color);
+        transform: translate(0, -50%) scale(1)
+      }
+    }
+
+    .shake {
+      animation: shake .4s cubic-bezier(.36, .07, .19, .97) both
+    }
+
+    @keyframes shake {
+
+      10%,
+      90% {
+        transform: translate3d(-1px, 0, 0)
+      }
+
+      20%,
+      80% {
+        transform: translate3d(2px, 0, 0)
+      }
+
+      30%,
+      50%,
+      70% {
+        transform: translate3d(-3px, 0, 0)
+      }
+
+      40%,
+      60% {
+        transform: translate3d(3px, 0, 0)
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <form id="search-form" action="https://www.google.com/search" method="get" autocomplete="off">
+    <div class="input-wrapper">
+      <div id="measure" class="measure typo"></div>
+      <div class="idle-caret"></div>
+      <div id="ghost" class="ghost-text typo"></div>
+      <input id="q" type="text" name="q" class="typo" autofocus autocomplete="off" aria-label="搜索">
+    </div>
+  </form>
+  <script src="script.js"></script>
+</body>
+
+</html>
