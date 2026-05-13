@@ -37,25 +37,9 @@ function syncMeasureStyles() {
     measureElement.style.lineHeight = computedStyle.lineHeight;
 }
 
-function getCommandHint(value) {
-    if (!value.startsWith('/') || value.includes(' ')) return '';
-
-    const command = value.slice(1).toLowerCase();
-    if (!command) return '/help  /g  /b  /bi  /gh';
-
-    return resolveCommand(command).type === 'unknown'
-        ? 'Enter 搜索文本'
-        : 'Space 执行';
-}
-
-function getGhostText(value) {
+function getGhostText() {
     if (calculatorResult !== null) return `= ${calculatorResult}`;
-    if (!value) return '';
-
-    const commandHint = getCommandHint(value);
-    if (commandHint) return commandHint;
-
-    return getURLTarget(value) ? 'Enter 打开  Shift+Enter 搜索' : '';
+    return '';
 }
 
 function updateUI() {
@@ -70,7 +54,7 @@ function updateUI() {
 
     caretElement.style.transform = `translate(${clampedPosition}px, -50%) scale(1.3, 0.85)`;
 
-    const ghostText = getGhostText(value);
+    const ghostText = getGhostText();
     ghostElement.textContent = ghostText;
     ghostElement.style.transform = `translate(${ghostText ? clampedPosition + 25 : 0}px, -50%)`;
 
