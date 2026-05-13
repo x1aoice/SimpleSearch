@@ -6,6 +6,10 @@ test('resolves search engine commands', () => {
     const result = resolveCommand('b');
     assert.equal(result.type, 'engine');
     assert.equal(result.engine.label, 'Baidu');
+
+    const duckDuckGo = resolveCommand('ddg');
+    assert.equal(duckDuckGo.type, 'engine');
+    assert.equal(duckDuckGo.engine.label, 'DuckDuckGo');
 });
 
 test('resolves custom search engine commands', () => {

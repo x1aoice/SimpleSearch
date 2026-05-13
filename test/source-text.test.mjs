@@ -9,6 +9,8 @@ test('keeps Chinese UI text readable in source files', async () => {
     ]);
     const source = `${html}\n${app}`;
 
+    assert.match(html, /id="custom-engine-color" type="text"/);
+    assert.doesNotMatch(html, /id="custom-engine-color" type="color"/);
     assert.match(html, /aria-label="搜索"/);
     assert.match(html, /URL（用 %s 代替搜索字词）/);
     assert.match(html, />颜色</);

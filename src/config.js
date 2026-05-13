@@ -3,9 +3,7 @@ export const SEARCH_ENGINES = {
     b: { label: 'Baidu', action: 'https://www.baidu.com/s', param: 'wd', color: '#2932E1' },
     bi: { label: 'Bing', action: 'https://www.bing.com/search', param: 'q', color: '#00809d' },
     gh: { label: 'GitHub', action: 'https://github.com/search', param: 'q', color: '#A371F7' },
-    v: { label: 'Bilibili', action: 'https://search.bilibili.com/all', param: 'keyword', color: '#FB7299' },
-    z: { label: 'Zhihu', action: 'https://www.zhihu.com/search', param: 'q', color: '#0084FF' },
-    y: { label: 'YouTube', action: 'https://www.youtube.com/results', param: 'search_query', color: '#FF0000' },
+    ddg: { label: 'DuckDuckGo', action: 'https://duckduckgo.com/', param: 'q', color: '#de5833' },
 };
 
 export const THEME_OPTIONS = [

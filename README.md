@@ -23,9 +23,7 @@ Type a command and press Space.
 | `/b` | Baidu |
 | `/bi` | Bing |
 | `/gh` | GitHub |
-| `/v` | Bilibili |
-| `/z` | Zhihu |
-| `/y` | YouTube |
+| `/ddg` | DuckDuckGo |
 | `/dark` | Dark theme |
 | `/light` | Light theme |
 | `/help` | Open help |

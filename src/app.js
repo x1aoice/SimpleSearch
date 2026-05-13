@@ -173,8 +173,8 @@ function renderCustomEngines() {
             row.classList.toggle('editing', engine.key === editingCustomEngineKey);
             key.textContent = `/${engine.key}`;
             label.textContent = engine.label;
-            color.className = 'custom-engine-swatch';
-            color.style.backgroundColor = engine.color;
+            color.className = 'custom-engine-color-code';
+            color.textContent = engine.color;
             color.title = engine.color;
             template.textContent = engine.template;
             template.title = engine.template;
