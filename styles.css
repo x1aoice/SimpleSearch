@@ -210,7 +210,7 @@ input[type="text"] {
 }
 
 .settings-panel {
-  width: min(620px, calc(100vw - 64px));
+  width: min(760px, calc(100vw - 64px));
 }
 
 .settings-content {
@@ -254,6 +254,87 @@ input[type="text"] {
 .choice-button.active {
   border-color: var(--text);
   color: var(--text);
+}
+
+.custom-engine-form {
+  display: grid;
+  grid-template-columns: 86px 140px 1fr 64px;
+  gap: 8px;
+  align-items: end;
+}
+
+.custom-engine-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.custom-engine-form span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.custom-engine-form input {
+  width: 100%;
+  height: 34px;
+  border: 1px solid var(--surface-border);
+  border-radius: 6px;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  letter-spacing: 0;
+  padding: 0 10px;
+}
+
+.custom-engine-form input:focus {
+  border-color: var(--text);
+}
+
+.add-engine-button {
+  min-width: 0;
+}
+
+.custom-engine-error {
+  min-height: 18px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.custom-engine-error:empty {
+  display: none;
+}
+
+.custom-engine-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.custom-engine-row {
+  display: grid;
+  grid-template-columns: 86px 140px 1fr 34px;
+  gap: 8px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.custom-engine-row strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.custom-engine-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.delete-engine-button {
+  min-width: 34px;
+  padding: 0;
 }
 
 .icon-button {

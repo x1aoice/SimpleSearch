@@ -9,6 +9,12 @@ import {
     THEME_OPTIONS,
 } from './config.js';
 import { resolveCommand } from './commands.js';
+import {
+    loadCustomEngines,
+    saveCustomEngines,
+    toEngineMap,
+    validateCustomEngine,
+} from './custom-engines.js';
 import { tryCalculate } from './calculator.js';
 import { getSearchTarget, getURLTarget } from './url.js';
 import { safeGetItem, safeRemoveItem, safeSetItem } from './storage.js';
@@ -28,9 +34,17 @@ const commandHelpElement = document.getElementById('command-help');
 const shortcutHelpElement = document.getElementById('shortcut-help');
 const settingsEnginesElement = document.getElementById('settings-engines');
 const settingsThemesElement = document.getElementById('settings-themes');
+const customEngineForm = document.getElementById('custom-engine-form');
+const customEngineKeyInput = document.getElementById('custom-engine-key');
+const customEngineLabelInput = document.getElementById('custom-engine-label');
+const customEngineTemplateInput = document.getElementById('custom-engine-template');
+const customEngineErrorElement = document.getElementById('custom-engine-error');
+const customEngineListElement = document.getElementById('custom-engine-list');
 
 let currentEngineKey = DEFAULT_ENGINE_KEY;
-let currentEngine = SEARCH_ENGINES[currentEngineKey];
+let customEngines = loadCustomEngines();
+let searchEngines = toEngineMap(customEngines);
+let currentEngine = searchEngines[currentEngineKey];
 let currentTheme = DEFAULT_THEME;
 let calculatorResult = null;
 let blinkTimer = null;
@@ -101,7 +115,7 @@ function renderDefinitionList(element, items) {
 function renderHelp() {
     renderDefinitionList(
         engineHelpElement,
-        Object.entries(SEARCH_ENGINES).map(([key, engine]) => ({
+        Object.entries(searchEngines).map(([key, engine]) => ({
             keys: `/${key}`,
             description: engine.label,
         })),
@@ -121,12 +135,38 @@ function createChoiceButton(label, value, group) {
 
 function renderSettings() {
     settingsEnginesElement.replaceChildren(
-        ...Object.entries(SEARCH_ENGINES).map(([key, engine]) => createChoiceButton(engine.label, key, 'engine')),
+        ...Object.entries(searchEngines).map(([key, engine]) => createChoiceButton(engine.label, key, 'engine')),
     );
     settingsThemesElement.replaceChildren(
         ...THEME_OPTIONS.map(theme => createChoiceButton(theme.label, theme.key, 'theme')),
     );
+    renderCustomEngines();
     updateSettingsState();
+}
+
+function renderCustomEngines() {
+    customEngineListElement.replaceChildren(
+        ...customEngines.map(engine => {
+            const row = document.createElement('div');
+            const key = document.createElement('strong');
+            const label = document.createElement('span');
+            const template = document.createElement('span');
+            const button = document.createElement('button');
+
+            row.className = 'custom-engine-row';
+            key.textContent = `/${engine.key}`;
+            label.textContent = engine.label;
+            template.textContent = engine.template;
+            button.className = 'choice-button delete-engine-button';
+            button.type = 'button';
+            button.dataset.deleteEngine = engine.key;
+            button.ariaLabel = `删除 ${engine.label}`;
+            button.textContent = 'x';
+
+            row.append(key, label, template, button);
+            return row;
+        }),
+    );
 }
 
 function updateSettingsState() {
@@ -156,7 +196,7 @@ function showSettings() {
 }
 
 function setSearchEngine(key, savePreference = true, animate = true) {
-    const engine = SEARCH_ENGINES[key];
+    const engine = searchEngines[key];
     if (!engine) return;
 
     currentEngineKey = key;
@@ -227,8 +267,16 @@ function triggerRecoil() {
     setTimeout(() => inputWrapper.classList.remove('recoil'), 50);
 }
 
+function refreshCustomEngines(nextEngines) {
+    customEngines = nextEngines;
+    searchEngines = toEngineMap(customEngines);
+    saveCustomEngines(customEngines);
+    renderHelp();
+    renderSettings();
+}
+
 function executeCommand(command) {
-    const result = resolveCommand(command);
+    const result = resolveCommand(command, searchEngines);
 
     if (result.type === 'engine') {
         setSearchEngine(result.key);
@@ -254,6 +302,38 @@ function executeCommand(command) {
     }
 
     return false;
+}
+
+function addCustomEngine() {
+    const result = validateCustomEngine(
+        {
+            key: customEngineKeyInput.value,
+            label: customEngineLabelInput.value,
+            template: customEngineTemplateInput.value,
+        },
+        customEngines,
+    );
+
+    if (!result.ok) {
+        customEngineErrorElement.textContent = result.message;
+        return;
+    }
+
+    customEngineErrorElement.textContent = '';
+    refreshCustomEngines([...customEngines, result.engine]);
+    customEngineForm.reset();
+    customEngineKeyInput.focus();
+}
+
+function deleteCustomEngine(key) {
+    const nextEngines = customEngines.filter(engine => engine.key !== key);
+
+    if (currentEngineKey === key) {
+        setSearchEngine(DEFAULT_ENGINE_KEY);
+    }
+
+    customEngineErrorElement.textContent = '';
+    refreshCustomEngines(nextEngines);
 }
 
 function navigateFromInput(forceSearch = false) {
@@ -346,6 +426,15 @@ settingsThemesElement.addEventListener('click', event => {
     setTheme(button.dataset.theme);
     inputElement.focus();
 });
+customEngineForm.addEventListener('submit', event => {
+    event.preventDefault();
+    addCustomEngine();
+});
+customEngineListElement.addEventListener('click', event => {
+    const button = event.target.closest('[data-delete-engine]');
+    if (!button) return;
+    deleteCustomEngine(button.dataset.deleteEngine);
+});
 
 document.addEventListener('click', event => {
     if (helpPanel.contains(event.target) || settingsPanel.contains(event.target)) return;
@@ -356,7 +445,7 @@ renderHelp();
 renderSettings();
 
 const savedEngine = safeGetItem(localStorage, STORAGE_KEYS.engine);
-if (SEARCH_ENGINES[savedEngine]) {
+if (searchEngines[savedEngine]) {
     setSearchEngine(savedEngine, false, false);
 } else {
     setSearchEngine(currentEngineKey, false, false);

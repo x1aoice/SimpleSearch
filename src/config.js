@@ -20,6 +20,7 @@ export const CARET_OFFSET = 15;
 export const SAFE_PROTOCOLS = new Set(['http', 'https', 'ftp', 'ftps']);
 
 export const STORAGE_KEYS = {
+    customEngines: 'customSearchEngines',
     engine: 'defaultSearchEngine',
     theme: 'theme',
 };

@@ -11,6 +11,7 @@ SimpleSearch is a minimalist desktop search launcher. It keeps the page quiet: t
 - System, light, and dark themes.
 - Built-in `/help` panel.
 - Built-in `/settings` panel for default engine and theme.
+- Custom search engines with `%s` URL templates.
 
 ## Commands
 
@@ -32,6 +33,22 @@ Type a command and press Space.
 | `/set` | Open settings |
 
 Slash text is still searchable. For example, `/b` + Enter searches `/b`; only `/b` + Space runs the command.
+
+## Custom Search Engines
+
+Open `/settings`, then add a command, name, and URL template. The URL must include `%s`.
+
+```text
+Command: mdn
+Name: MDN
+URL: https://developer.mozilla.org/search?q=%s
+```
+
+Then use it like:
+
+```text
+/mdn array map
+```
 
 ## Shortcuts
 
@@ -59,6 +76,7 @@ SimpleSearch/
 └─ test/
    ├─ calculator.test.mjs
    ├─ commands.test.mjs
+   ├─ custom-engines.test.mjs
    └─ url.test.mjs
 ```
 

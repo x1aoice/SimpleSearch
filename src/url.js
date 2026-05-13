@@ -45,5 +45,9 @@ export function getURLTarget(input) {
 }
 
 export function getSearchTarget(engine, input) {
+    if (engine.template) {
+        return engine.template.replace('%s', encodeURIComponent(input));
+    }
+
     return `${engine.action}?${engine.param}=${encodeURIComponent(input)}`;
 }

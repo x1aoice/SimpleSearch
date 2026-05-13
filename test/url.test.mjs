@@ -25,4 +25,8 @@ test('builds search URLs from the selected engine', () => {
         getSearchTarget(SEARCH_ENGINES.g, '1.1.1.1'),
         'https://www.google.com/search?q=1.1.1.1',
     );
+    assert.equal(
+        getSearchTarget({ template: 'https://developer.mozilla.org/search?q=%s' }, 'array map'),
+        'https://developer.mozilla.org/search?q=array%20map',
+    );
 });

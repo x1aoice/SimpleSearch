@@ -1,8 +1,8 @@
 import { SEARCH_ENGINES } from './config.js';
 
-export function resolveCommand(command) {
-    if (SEARCH_ENGINES[command]) {
-        return { type: 'engine', key: command, engine: SEARCH_ENGINES[command] };
+export function resolveCommand(command, engines = SEARCH_ENGINES) {
+    if (engines[command]) {
+        return { type: 'engine', key: command, engine: engines[command] };
     }
 
     if (command === 'dark' || command === 'light') {

@@ -8,6 +8,18 @@ test('resolves search engine commands', () => {
     assert.equal(result.engine.label, 'Baidu');
 });
 
+test('resolves custom search engine commands', () => {
+    const result = resolveCommand('mdn', {
+        mdn: {
+            label: 'MDN',
+            template: 'https://developer.mozilla.org/search?q=%s',
+        },
+    });
+
+    assert.equal(result.type, 'engine');
+    assert.equal(result.engine.label, 'MDN');
+});
+
 test('resolves utility commands', () => {
     assert.deepEqual(resolveCommand('dark'), { type: 'theme', theme: 'dark' });
     assert.deepEqual(resolveCommand('light'), { type: 'theme', theme: 'light' });
