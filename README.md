@@ -8,7 +8,7 @@ SimpleSearch is a minimalist desktop search launcher. It keeps the page quiet: t
 - Direct URL, domain, IP, and localhost navigation.
 - `Shift+Enter` to force search when an IP or domain should be searched instead of opened.
 - Inline calculator for simple arithmetic.
-- Light and dark themes.
+- System, light, and dark themes.
 - Built-in `/help` panel.
 - Built-in `/settings` panel for default engine and theme.
 
