@@ -90,7 +90,7 @@ form {
   transition: text-shadow 0.3s ease;
 }
 
-input[type="text"] {
+#q {
   position: absolute;
   inset: 0;
   z-index: 2;
