@@ -62,23 +62,10 @@ export function validateCustomEngine(input, existingEngines = [], editingKey = '
         return { ok: false, message: '名称需要 1-32 个字符。' };
     }
 
-    if (!rawTemplate) {
-        return { ok: false, message: 'URL 需要包含 %s。' };
-    }
-
-    if (!isHttpTemplate(template)) {
-        return { ok: false, message: 'URL 只支持 http:// 或 https://。' };
-    }
-
-    if (!template.includes('%s')) {
-        return { ok: false, message: 'URL 需要包含 %s。' };
-    }
-
-    try {
-        new URL(template.replace('%s', 'test'));
-    } catch {
-        return { ok: false, message: 'URL 格式无效。' };
-    }
+    if (!rawTemplate) return { ok: false, message: 'URL 不能为空。' };
+    if (!isHttpTemplate(template)) return { ok: false, message: 'URL 只支持 http:// 或 https://。' };
+    if (!template.includes('%s')) return { ok: false, message: 'URL 中用 %s 代替搜索字词。' };
+    if (!isValidTemplateURL(template)) return { ok: false, message: 'URL 格式无效。' };
 
     return {
         ok: true,
@@ -98,6 +85,15 @@ function normalizeTemplate(template) {
 
 function isHttpTemplate(template) {
     return /^https?:\/\//i.test(template);
+}
+
+function isValidTemplateURL(template) {
+    try {
+        new URL(template.replaceAll('%s', 'test'));
+        return true;
+    } catch {
+        return false;
+    }
 }
 
 function normalizeCustomEngine(engine) {
