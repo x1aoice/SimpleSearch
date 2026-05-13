@@ -49,6 +49,27 @@ test('rejects reserved, duplicate, and invalid engines', () => {
     }, [{ key: 'mdn' }]).ok, false);
 });
 
+test('allows editing the same custom engine command', () => {
+    const result = validateCustomEngine({
+        key: 'mdn',
+        label: 'MDN Web Docs',
+        template: 'https://developer.mozilla.org/search?q=%s',
+    }, [{ key: 'mdn' }], 'mdn');
+
+    assert.equal(result.ok, true);
+    assert.equal(result.engine.label, 'MDN Web Docs');
+});
+
+test('rejects editing a custom engine into another custom command', () => {
+    const result = validateCustomEngine({
+        key: 'docs',
+        label: 'MDN Web Docs',
+        template: 'https://developer.mozilla.org/search?q=%s',
+    }, [{ key: 'mdn' }, { key: 'docs' }], 'mdn');
+
+    assert.equal(result.ok, false);
+});
+
 test('loads and maps valid custom engines from storage', () => {
     const storage = createStorage(JSON.stringify([
         { key: 'mdn', label: 'MDN', template: 'https://developer.mozilla.org/search?q=%s' },

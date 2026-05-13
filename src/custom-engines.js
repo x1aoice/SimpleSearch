@@ -39,7 +39,7 @@ export function toEngineMap(customEngines) {
     };
 }
 
-export function validateCustomEngine(input, existingEngines = []) {
+export function validateCustomEngine(input, existingEngines = [], editingKey = '') {
     const key = input.key.trim().toLowerCase();
     const label = input.label.trim();
     const template = input.template.trim();
@@ -52,7 +52,7 @@ export function validateCustomEngine(input, existingEngines = []) {
         return { ok: false, message: '这个命令已被占用。' };
     }
 
-    if (existingEngines.some(engine => engine.key === key)) {
+    if (existingEngines.some(engine => engine.key === key && engine.key !== editingKey)) {
         return { ok: false, message: '这个命令已存在。' };
     }
 

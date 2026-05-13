@@ -314,7 +314,7 @@ form {
 
 .custom-engine-row {
   display: grid;
-  grid-template-columns: 86px 140px 1fr 34px;
+  grid-template-columns: 86px 140px 1fr 54px 34px;
   gap: 8px;
   align-items: center;
   color: var(--muted);
@@ -332,6 +332,12 @@ form {
   white-space: nowrap;
 }
 
+.cancel-engine-button {
+  width: fit-content;
+  margin-top: 8px;
+}
+
+.edit-engine-button,
 .delete-engine-button {
   min-width: 34px;
   padding: 0;

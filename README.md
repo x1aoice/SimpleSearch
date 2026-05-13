@@ -11,7 +11,7 @@ SimpleSearch is a minimalist desktop search launcher. It keeps the page quiet: t
 - System, light, and dark themes.
 - Built-in `/help` panel.
 - Built-in `/settings` panel for default engine and theme.
-- Custom search engines with `%s` URL templates.
+- Custom search engines with `%s` URL templates, editing, and deletion.
 
 ## Commands
 
@@ -49,6 +49,8 @@ Then use it like:
 ```text
 /mdn array map
 ```
+
+Use the edit button in settings to update a custom engine's name or URL. Delete removes it from the local configuration.
 
 ## Shortcuts
 

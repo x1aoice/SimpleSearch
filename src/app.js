@@ -38,6 +38,8 @@ const customEngineForm = document.getElementById('custom-engine-form');
 const customEngineKeyInput = document.getElementById('custom-engine-key');
 const customEngineLabelInput = document.getElementById('custom-engine-label');
 const customEngineTemplateInput = document.getElementById('custom-engine-template');
+const customEngineSubmitButton = document.getElementById('custom-engine-submit');
+const customEngineCancelButton = document.getElementById('custom-engine-cancel');
 const customEngineErrorElement = document.getElementById('custom-engine-error');
 const customEngineListElement = document.getElementById('custom-engine-list');
 
@@ -46,6 +48,7 @@ let customEngines = loadCustomEngines();
 let searchEngines = toEngineMap(customEngines);
 let currentEngine = searchEngines[currentEngineKey];
 let currentTheme = DEFAULT_THEME;
+let editingCustomEngineKey = '';
 let calculatorResult = null;
 let blinkTimer = null;
 let jumpTimer = null;
@@ -151,19 +154,25 @@ function renderCustomEngines() {
             const key = document.createElement('strong');
             const label = document.createElement('span');
             const template = document.createElement('span');
-            const button = document.createElement('button');
+            const editButton = document.createElement('button');
+            const deleteButton = document.createElement('button');
 
             row.className = 'custom-engine-row';
             key.textContent = `/${engine.key}`;
             label.textContent = engine.label;
             template.textContent = engine.template;
-            button.className = 'choice-button delete-engine-button';
-            button.type = 'button';
-            button.dataset.deleteEngine = engine.key;
-            button.ariaLabel = `删除 ${engine.label}`;
-            button.textContent = 'x';
+            editButton.className = 'choice-button edit-engine-button';
+            editButton.type = 'button';
+            editButton.dataset.editEngine = engine.key;
+            editButton.ariaLabel = `编辑 ${engine.label}`;
+            editButton.textContent = '编辑';
+            deleteButton.className = 'choice-button delete-engine-button';
+            deleteButton.type = 'button';
+            deleteButton.dataset.deleteEngine = engine.key;
+            deleteButton.ariaLabel = `删除 ${engine.label}`;
+            deleteButton.textContent = 'x';
 
-            row.append(key, label, template, button);
+            row.append(key, label, template, editButton, deleteButton);
             return row;
         }),
     );
@@ -201,8 +210,8 @@ function setSearchEngine(key, savePreference = true, animate = true) {
 
     currentEngineKey = key;
     currentEngine = engine;
-    formElement.action = engine.action;
-    inputElement.name = engine.param;
+    formElement.action = engine.action || '';
+    inputElement.name = engine.param || 'q';
     document.body.style.setProperty('--flash-color', engine.color);
     resetInputState();
     updateSettingsState();
@@ -270,6 +279,7 @@ function triggerRecoil() {
 function refreshCustomEngines(nextEngines) {
     customEngines = nextEngines;
     searchEngines = toEngineMap(customEngines);
+    currentEngine = searchEngines[currentEngineKey] || searchEngines[DEFAULT_ENGINE_KEY];
     saveCustomEngines(customEngines);
     renderHelp();
     renderSettings();
@@ -304,7 +314,30 @@ function executeCommand(command) {
     return false;
 }
 
-function addCustomEngine() {
+function resetCustomEngineForm() {
+    editingCustomEngineKey = '';
+    customEngineForm.reset();
+    customEngineKeyInput.disabled = false;
+    customEngineSubmitButton.textContent = '添加';
+    customEngineCancelButton.hidden = true;
+    customEngineErrorElement.textContent = '';
+}
+
+function editCustomEngine(key) {
+    const engine = customEngines.find(item => item.key === key);
+    if (!engine) return;
+
+    editingCustomEngineKey = key;
+    customEngineKeyInput.value = engine.key;
+    customEngineLabelInput.value = engine.label;
+    customEngineTemplateInput.value = engine.template;
+    customEngineSubmitButton.textContent = '保存';
+    customEngineCancelButton.hidden = false;
+    customEngineErrorElement.textContent = '';
+    customEngineKeyInput.focus();
+}
+
+function saveCustomEngine() {
     const result = validateCustomEngine(
         {
             key: customEngineKeyInput.value,
@@ -312,6 +345,7 @@ function addCustomEngine() {
             template: customEngineTemplateInput.value,
         },
         customEngines,
+        editingCustomEngineKey,
     );
 
     if (!result.ok) {
@@ -319,9 +353,18 @@ function addCustomEngine() {
         return;
     }
 
+    const editedEngineKey = editingCustomEngineKey;
+    const shouldKeepCurrentEngine = editedEngineKey && currentEngineKey === editedEngineKey;
+    const nextEngines = editedEngineKey
+        ? customEngines.map(engine => (engine.key === editedEngineKey ? result.engine : engine))
+        : [...customEngines, result.engine];
+
     customEngineErrorElement.textContent = '';
-    refreshCustomEngines([...customEngines, result.engine]);
-    customEngineForm.reset();
+    refreshCustomEngines(nextEngines);
+    if (shouldKeepCurrentEngine) {
+        setSearchEngine(result.engine.key, true, false);
+    }
+    resetCustomEngineForm();
     customEngineKeyInput.focus();
 }
 
@@ -330,6 +373,10 @@ function deleteCustomEngine(key) {
 
     if (currentEngineKey === key) {
         setSearchEngine(DEFAULT_ENGINE_KEY);
+    }
+
+    if (editingCustomEngineKey === key) {
+        resetCustomEngineForm();
     }
 
     customEngineErrorElement.textContent = '';
@@ -428,9 +475,19 @@ settingsThemesElement.addEventListener('click', event => {
 });
 customEngineForm.addEventListener('submit', event => {
     event.preventDefault();
-    addCustomEngine();
+    saveCustomEngine();
+});
+customEngineCancelButton.addEventListener('click', () => {
+    resetCustomEngineForm();
+    customEngineKeyInput.focus();
 });
 customEngineListElement.addEventListener('click', event => {
+    const editButton = event.target.closest('[data-edit-engine]');
+    if (editButton) {
+        editCustomEngine(editButton.dataset.editEngine);
+        return;
+    }
+
     const button = event.target.closest('[data-delete-engine]');
     if (!button) return;
     deleteCustomEngine(button.dataset.deleteEngine);
