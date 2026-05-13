@@ -9,7 +9,7 @@ SimpleSearch is a minimalist desktop search launcher. It keeps the page quiet: t
 - `Shift+Enter` to force search when an IP or domain should be searched instead of opened.
 - System, light, and dark themes.
 - Built-in `/help` panel.
-- Built-in `/settings` panel for theme and custom search engines.
+- Built-in `/set` panel for custom search engines.
 - Custom search engines with `%s` URL templates, editing, and deletion.
 
 ## Commands
@@ -26,14 +26,13 @@ Type a command and press Space.
 | `/dark` | Dark theme |
 | `/light` | Light theme |
 | `/help` | Open help |
-| `/settings` | Open settings |
 | `/set` | Open settings |
 
 Slash text is still searchable. For example, `/b` + Enter searches `/b`; only `/b` + Space runs the command.
 
 ## Custom Search Engines
 
-Open `/settings`, then add a command, name, and URL template. Use `%s` where the typed search text should go. If the protocol is omitted, SimpleSearch saves it with `https://`.
+Open `/set`, then add a command, name, and URL template. Use `%s` where the typed search text should go. If the protocol is omitted, SimpleSearch saves it with `https://`.
 
 ```text
 Command: mdn
@@ -53,9 +52,7 @@ Use the edit button in settings to update a custom engine's name, URL, or flash 
 
 | Shortcut | Action |
 | --- | --- |
-| Enter | Search or open a detected URL/IP |
 | Shift+Enter | Force search the current input |
-| Esc | Clear input or close help |
 
 ## Project Structure
 

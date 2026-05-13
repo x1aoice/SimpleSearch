@@ -4,9 +4,7 @@ import {
     DEFAULT_ENGINE_KEY,
     DEFAULT_THEME,
     SEARCH_ENGINES,
-    SHORTCUT_HELP,
     STORAGE_KEYS,
-    THEME_OPTIONS,
 } from './config.js';
 import { resolveCommand } from './commands.js';
 import {
@@ -28,8 +26,6 @@ const helpPanel = document.getElementById('help-panel');
 const settingsPanel = document.getElementById('settings-panel');
 const engineHelpElement = document.getElementById('engine-help');
 const commandHelpElement = document.getElementById('command-help');
-const shortcutHelpElement = document.getElementById('shortcut-help');
-const settingsThemesElement = document.getElementById('settings-themes');
 const customEngineForm = document.getElementById('custom-engine-form');
 const customEngineKeyInput = document.getElementById('custom-engine-key');
 const customEngineLabelInput = document.getElementById('custom-engine-label');
@@ -111,24 +107,10 @@ function renderHelp() {
         })),
     );
     renderDefinitionList(commandHelpElement, COMMAND_HELP);
-    renderDefinitionList(shortcutHelpElement, SHORTCUT_HELP);
-}
-
-function createChoiceButton(label, value, group) {
-    const button = document.createElement('button');
-    button.className = 'choice-button';
-    button.type = 'button';
-    button.dataset[group] = value;
-    button.textContent = label;
-    return button;
 }
 
 function renderSettings() {
-    settingsThemesElement.replaceChildren(
-        ...THEME_OPTIONS.map(theme => createChoiceButton(theme.label, theme.key, 'theme')),
-    );
     renderCustomEngines();
-    updateSettingsState();
 }
 
 function renderCustomEngines() {
@@ -176,12 +158,6 @@ function renderCustomEngines() {
     );
 }
 
-function updateSettingsState() {
-    for (const button of settingsThemesElement.querySelectorAll('.choice-button')) {
-        button.classList.toggle('active', button.dataset.theme === currentTheme);
-    }
-}
-
 function hidePanels() {
     helpPanel.hidden = true;
     settingsPanel.hidden = true;
@@ -194,7 +170,6 @@ function showHelp() {
 
 function showSettings() {
     hidePanels();
-    updateSettingsState();
     settingsPanel.hidden = false;
 }
 
@@ -250,7 +225,6 @@ function setTheme(theme, savePreference = true) {
         }
     }
 
-    updateSettingsState();
     setTimeout(updateUI, 50);
 }
 
@@ -450,12 +424,6 @@ window.addEventListener('resize', () => {
 inputElement.addEventListener('scroll', updateUI);
 inputElement.addEventListener('focus', updateUI);
 inputWrapper.addEventListener('animationend', () => inputWrapper.classList.remove('shake'));
-settingsThemesElement.addEventListener('click', event => {
-    const button = event.target.closest('[data-theme]');
-    if (!button) return;
-    setTheme(button.dataset.theme);
-    inputElement.focus();
-});
 customEngineForm.addEventListener('submit', event => {
     event.preventDefault();
     saveCustomEngine();

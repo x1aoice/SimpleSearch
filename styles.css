@@ -168,8 +168,8 @@ form {
 
 .help-content {
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr) minmax(0, 1.1fr);
-  gap: 30px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 36px;
 }
 
 .help-list {
@@ -231,12 +231,6 @@ form {
   color: var(--muted);
   font-size: 12px;
   text-align: right;
-}
-
-.choice-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
 }
 
 .choice-button {
