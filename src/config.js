@@ -15,7 +15,6 @@ export const SAFE_PROTOCOLS = new Set(['http', 'https', 'ftp', 'ftps']);
 
 export const STORAGE_KEYS = {
     engine: 'defaultSearchEngine',
-    history: 'searchHistory',
     theme: 'theme',
 };
 
@@ -23,13 +22,11 @@ export const COMMAND_HELP = [
     { keys: '/help', description: '打开帮助' },
     { keys: '/dark', description: '深色主题' },
     { keys: '/light', description: '浅色主题' },
-    { keys: '/clear', description: '清空历史' },
 ];
 
 export const SHORTCUT_HELP = [
     { keys: 'Enter', description: '搜索，或直接打开 URL/IP' },
     { keys: 'Shift+Enter', description: '强制搜索当前输入' },
     { keys: 'Tab', description: '接受计算结果' },
-    { keys: 'Up / Down', description: '浏览历史' },
     { keys: 'Esc', description: '清空输入或关闭帮助' },
 ];

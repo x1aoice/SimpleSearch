@@ -12,7 +12,6 @@ test('resolves utility commands', () => {
     assert.deepEqual(resolveCommand('dark'), { type: 'theme', theme: 'dark' });
     assert.deepEqual(resolveCommand('light'), { type: 'theme', theme: 'light' });
     assert.deepEqual(resolveCommand('help'), { type: 'help' });
-    assert.deepEqual(resolveCommand('clear'), { type: 'clearHistory' });
 });
 
 test('keeps unknown slash text searchable', () => {

@@ -9,7 +9,6 @@ import {
 import { resolveCommand } from './commands.js';
 import { tryCalculate } from './calculator.js';
 import { getSearchTarget, getURLTarget } from './url.js';
-import { clearSearchHistory, loadSearchHistory, pushSearchHistory, saveSearchHistory } from './history.js';
 import { safeGetItem, safeSetItem } from './storage.js';
 
 const inputElement = document.getElementById('q');
@@ -23,17 +22,12 @@ const helpCloseButton = document.getElementById('help-close');
 const engineHelpElement = document.getElementById('engine-help');
 const commandHelpElement = document.getElementById('command-help');
 const shortcutHelpElement = document.getElementById('shortcut-help');
-const statusElement = document.getElementById('status');
 
 let currentEngineKey = DEFAULT_ENGINE_KEY;
 let currentEngine = SEARCH_ENGINES[currentEngineKey];
-let searchHistory = loadSearchHistory();
-let historyIndex = -1;
-let tempInput = '';
 let calculatorResult = null;
 let blinkTimer = null;
 let jumpTimer = null;
-let statusTimer = null;
 
 function syncMeasureStyles() {
     const computedStyle = window.getComputedStyle(inputElement);
@@ -56,7 +50,7 @@ function getCommandHint(value) {
 
 function getGhostText(value) {
     if (calculatorResult !== null) return `= ${calculatorResult}`;
-    if (!value) return '/help + Space';
+    if (!value) return '';
 
     const commandHint = getCommandHint(value);
     if (commandHint) return commandHint;
@@ -94,26 +88,10 @@ function updateUI() {
     }, 500);
 }
 
-function showStatus(message) {
-    statusElement.textContent = message;
-    statusElement.classList.add('visible');
-
-    clearTimeout(statusTimer);
-    statusTimer = setTimeout(() => {
-        statusElement.classList.remove('visible');
-    }, 2200);
-}
-
-function hideStatus() {
-    clearTimeout(statusTimer);
-    statusElement.classList.remove('visible');
-}
-
 function resetInputState() {
     inputElement.value = '';
     inputElement.scrollLeft = 0;
     calculatorResult = null;
-    historyIndex = -1;
     updateUI();
 }
 
@@ -143,7 +121,6 @@ function renderHelp() {
 
 function showHelp() {
     helpPanel.hidden = false;
-    hideStatus();
 }
 
 function hideHelp() {
@@ -217,14 +194,12 @@ function executeCommand(command) {
 
     if (result.type === 'engine') {
         setSearchEngine(result.key);
-        showStatus(`搜索引擎: ${result.engine.label}`);
         return true;
     }
 
     if (result.type === 'theme') {
         setTheme(result.theme);
         resetInputState();
-        showStatus(result.theme === 'dark' ? '深色主题' : '浅色主题');
         return true;
     }
 
@@ -232,19 +207,6 @@ function executeCommand(command) {
         resetInputState();
         showHelp();
         return true;
-    }
-
-    if (result.type === 'clearHistory') {
-        searchHistory = [];
-        clearSearchHistory();
-        resetInputState();
-        showStatus('历史已清空');
-        return true;
-    }
-
-    if (command) {
-        showStatus(`未知命令 /${command}，Enter 搜索文本`);
-        triggerShake();
     }
 
     return false;
@@ -255,8 +217,6 @@ function navigateFromInput(forceSearch = false) {
 
     if (!value) return false;
 
-    searchHistory = pushSearchHistory(searchHistory, value);
-    saveSearchHistory(searchHistory);
     document.body.classList.add('departing');
 
     setTimeout(() => {
@@ -267,20 +227,8 @@ function navigateFromInput(forceSearch = false) {
     return true;
 }
 
-function browseHistory(direction) {
-    if (!searchHistory.length) return;
-
-    if (historyIndex === -1) tempInput = inputElement.value;
-    historyIndex = Math.max(-1, Math.min(historyIndex + direction, searchHistory.length - 1));
-    inputElement.value = historyIndex === -1
-        ? tempInput
-        : searchHistory[searchHistory.length - 1 - historyIndex];
-    updateUI();
-}
-
 inputElement.addEventListener('input', () => {
     calculatorResult = tryCalculate(inputElement.value);
-    historyIndex = -1;
     triggerRecoil();
     updateUI();
 });
@@ -309,8 +257,6 @@ inputElement.addEventListener('keydown', event => {
         }
 
         inputElement.value = '';
-        historyIndex = -1;
-        hideStatus();
         updateUI();
         return;
     }
@@ -321,17 +267,6 @@ inputElement.addEventListener('keydown', event => {
         calculatorResult = null;
         updateUI();
         return;
-    }
-
-    if (event.key === 'ArrowUp') {
-        event.preventDefault();
-        browseHistory(1);
-        return;
-    }
-
-    if (event.key === 'ArrowDown') {
-        event.preventDefault();
-        browseHistory(-1);
     }
 });
 

@@ -13,9 +13,5 @@ export function resolveCommand(command) {
         return { type: 'help' };
     }
 
-    if (command === 'clear') {
-        return { type: 'clearHistory' };
-    }
-
     return { type: 'unknown', command };
 }

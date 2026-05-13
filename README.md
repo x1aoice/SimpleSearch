@@ -8,7 +8,6 @@ SimpleSearch is a minimalist desktop search launcher. It keeps the page quiet: t
 - Direct URL, domain, IP, and localhost navigation.
 - `Shift+Enter` to force search when an IP or domain should be searched instead of opened.
 - Inline calculator for simple arithmetic.
-- Persistent local search history with Up / Down navigation.
 - Light and dark themes.
 - Built-in `/help` panel.
 
@@ -28,7 +27,6 @@ Type a command and press Space.
 | `/dark` | Dark theme |
 | `/light` | Light theme |
 | `/help` | Open help |
-| `/clear` | Clear local search history |
 
 Slash text is still searchable. For example, `/b` + Enter searches `/b`; only `/b` + Space runs the command.
 
@@ -39,7 +37,6 @@ Slash text is still searchable. For example, `/b` + Enter searches `/b`; only `/
 | Enter | Search or open a detected URL/IP |
 | Shift+Enter | Force search the current input |
 | Tab | Accept a calculator result |
-| Up / Down | Browse local search history |
 | Esc | Clear input or close help |
 
 ## Project Structure
@@ -54,7 +51,6 @@ SimpleSearch/
 │  ├─ calculator.js
 │  ├─ commands.js
 │  ├─ config.js
-│  ├─ history.js
 │  ├─ storage.js
 │  └─ url.js
 └─ test/
