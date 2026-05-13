@@ -2,14 +2,16 @@ import {
     CARET_OFFSET,
     COMMAND_HELP,
     DEFAULT_ENGINE_KEY,
+    DEFAULT_THEME,
     SEARCH_ENGINES,
     SHORTCUT_HELP,
     STORAGE_KEYS,
+    THEME_OPTIONS,
 } from './config.js';
 import { resolveCommand } from './commands.js';
 import { tryCalculate } from './calculator.js';
 import { getSearchTarget, getURLTarget } from './url.js';
-import { safeGetItem, safeSetItem } from './storage.js';
+import { safeGetItem, safeRemoveItem, safeSetItem } from './storage.js';
 
 const inputElement = document.getElementById('q');
 const formElement = document.getElementById('search-form');
@@ -19,12 +21,17 @@ const ghostElement = document.getElementById('ghost');
 const inputWrapper = document.querySelector('.input-wrapper');
 const helpPanel = document.getElementById('help-panel');
 const helpCloseButton = document.getElementById('help-close');
+const settingsPanel = document.getElementById('settings-panel');
+const settingsCloseButton = document.getElementById('settings-close');
 const engineHelpElement = document.getElementById('engine-help');
 const commandHelpElement = document.getElementById('command-help');
 const shortcutHelpElement = document.getElementById('shortcut-help');
+const settingsEnginesElement = document.getElementById('settings-engines');
+const settingsThemesElement = document.getElementById('settings-themes');
 
 let currentEngineKey = DEFAULT_ENGINE_KEY;
 let currentEngine = SEARCH_ENGINES[currentEngineKey];
+let currentTheme = DEFAULT_THEME;
 let calculatorResult = null;
 let blinkTimer = null;
 let jumpTimer = null;
@@ -103,12 +110,49 @@ function renderHelp() {
     renderDefinitionList(shortcutHelpElement, SHORTCUT_HELP);
 }
 
+function createChoiceButton(label, value, group) {
+    const button = document.createElement('button');
+    button.className = 'choice-button';
+    button.type = 'button';
+    button.dataset[group] = value;
+    button.textContent = label;
+    return button;
+}
+
+function renderSettings() {
+    settingsEnginesElement.replaceChildren(
+        ...Object.entries(SEARCH_ENGINES).map(([key, engine]) => createChoiceButton(engine.label, key, 'engine')),
+    );
+    settingsThemesElement.replaceChildren(
+        ...THEME_OPTIONS.map(theme => createChoiceButton(theme.label, theme.key, 'theme')),
+    );
+    updateSettingsState();
+}
+
+function updateSettingsState() {
+    for (const button of settingsEnginesElement.querySelectorAll('.choice-button')) {
+        button.classList.toggle('active', button.dataset.engine === currentEngineKey);
+    }
+
+    for (const button of settingsThemesElement.querySelectorAll('.choice-button')) {
+        button.classList.toggle('active', button.dataset.theme === currentTheme);
+    }
+}
+
+function hidePanels() {
+    helpPanel.hidden = true;
+    settingsPanel.hidden = true;
+}
+
 function showHelp() {
+    hidePanels();
     helpPanel.hidden = false;
 }
 
-function hideHelp() {
-    helpPanel.hidden = true;
+function showSettings() {
+    hidePanels();
+    updateSettingsState();
+    settingsPanel.hidden = false;
 }
 
 function setSearchEngine(key, savePreference = true, animate = true) {
@@ -121,6 +165,7 @@ function setSearchEngine(key, savePreference = true, animate = true) {
     inputElement.name = engine.param;
     document.body.style.setProperty('--flash-color', engine.color);
     resetInputState();
+    updateSettingsState();
 
     if (savePreference) {
         safeSetItem(localStorage, STORAGE_KEYS.engine, key);
@@ -145,18 +190,27 @@ function setSearchEngine(key, savePreference = true, animate = true) {
 }
 
 function setTheme(theme, savePreference = true) {
+    currentTheme = theme;
+
     if (theme === 'dark') {
         document.body.classList.add('dark');
         document.body.classList.remove('light-forced');
-    } else {
+    } else if (theme === 'light') {
         document.body.classList.remove('dark');
         document.body.classList.add('light-forced');
+    } else {
+        document.body.classList.remove('dark', 'light-forced');
     }
 
     if (savePreference) {
-        safeSetItem(localStorage, STORAGE_KEYS.theme, theme);
+        if (theme === DEFAULT_THEME) {
+            safeRemoveItem(localStorage, STORAGE_KEYS.theme);
+        } else {
+            safeSetItem(localStorage, STORAGE_KEYS.theme, theme);
+        }
     }
 
+    updateSettingsState();
     setTimeout(updateUI, 50);
 }
 
@@ -190,6 +244,12 @@ function executeCommand(command) {
     if (result.type === 'help') {
         resetInputState();
         showHelp();
+        return true;
+    }
+
+    if (result.type === 'settings') {
+        resetInputState();
+        showSettings();
         return true;
     }
 
@@ -235,8 +295,8 @@ inputElement.addEventListener('keydown', event => {
     }
 
     if (event.key === 'Escape') {
-        if (!helpPanel.hidden) {
-            hideHelp();
+        if (!helpPanel.hidden || !settingsPanel.hidden) {
+            hidePanels();
             return;
         }
 
@@ -272,14 +332,28 @@ window.addEventListener('resize', () => {
 inputElement.addEventListener('scroll', updateUI);
 inputElement.addEventListener('focus', updateUI);
 inputWrapper.addEventListener('animationend', () => inputWrapper.classList.remove('shake'));
-helpCloseButton.addEventListener('click', hideHelp);
+helpCloseButton.addEventListener('click', hidePanels);
+settingsCloseButton.addEventListener('click', hidePanels);
+settingsEnginesElement.addEventListener('click', event => {
+    const button = event.target.closest('[data-engine]');
+    if (!button) return;
+    setSearchEngine(button.dataset.engine);
+    inputElement.focus();
+});
+settingsThemesElement.addEventListener('click', event => {
+    const button = event.target.closest('[data-theme]');
+    if (!button) return;
+    setTheme(button.dataset.theme);
+    inputElement.focus();
+});
 
 document.addEventListener('click', event => {
-    if (helpPanel.contains(event.target)) return;
+    if (helpPanel.contains(event.target) || settingsPanel.contains(event.target)) return;
     inputElement.focus();
 });
 
 renderHelp();
+renderSettings();
 
 const savedEngine = safeGetItem(localStorage, STORAGE_KEYS.engine);
 if (SEARCH_ENGINES[savedEngine]) {
@@ -289,7 +363,7 @@ if (SEARCH_ENGINES[savedEngine]) {
 }
 
 const savedTheme = safeGetItem(localStorage, STORAGE_KEYS.theme);
-if (savedTheme) setTheme(savedTheme, false);
+setTheme(['dark', 'light'].includes(savedTheme) ? savedTheme : DEFAULT_THEME, false);
 
 setTimeout(() => {
     syncMeasureStyles();

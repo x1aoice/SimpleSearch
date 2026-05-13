@@ -10,6 +10,7 @@ SimpleSearch is a minimalist desktop search launcher. It keeps the page quiet: t
 - Inline calculator for simple arithmetic.
 - Light and dark themes.
 - Built-in `/help` panel.
+- Built-in `/settings` panel for default engine and theme.
 
 ## Commands
 
@@ -27,6 +28,8 @@ Type a command and press Space.
 | `/dark` | Dark theme |
 | `/light` | Light theme |
 | `/help` | Open help |
+| `/settings` | Open settings |
+| `/set` | Open settings |
 
 Slash text is still searchable. For example, `/b` + Enter searches `/b`; only `/b` + Space runs the command.
 

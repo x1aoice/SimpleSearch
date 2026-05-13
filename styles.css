@@ -146,7 +146,7 @@ input[type="text"] {
   pointer-events: none;
 }
 
-.help-panel {
+.panel {
   position: fixed;
   left: 50%;
   bottom: 32px;
@@ -162,11 +162,11 @@ input[type="text"] {
   backdrop-filter: blur(18px);
 }
 
-.help-panel[hidden] {
+.panel[hidden] {
   display: none;
 }
 
-.help-header {
+.panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -174,7 +174,7 @@ input[type="text"] {
   margin-bottom: 18px;
 }
 
-.help-header h1,
+.panel-header h1,
 .help-content h2 {
   margin: 0;
   font-size: 14px;
@@ -207,6 +207,53 @@ input[type="text"] {
 .help-list dd {
   margin: 0;
   color: var(--muted);
+}
+
+.settings-panel {
+  width: min(620px, calc(100vw - 64px));
+}
+
+.settings-content {
+  display: grid;
+  gap: 22px;
+}
+
+.settings-group {
+  margin: 0;
+}
+
+.settings-group h2 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.choice-grid,
+.choice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.choice-button {
+  min-width: 74px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--surface-border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  letter-spacing: 0;
+}
+
+.choice-button:hover,
+.choice-button.active {
+  border-color: var(--text);
+  color: var(--text);
 }
 
 .icon-button {

@@ -14,3 +14,12 @@ export function safeSetItem(storage, key, value) {
         return false;
     }
 }
+
+export function safeRemoveItem(storage, key) {
+    try {
+        storage.removeItem(key);
+        return true;
+    } catch {
+        return false;
+    }
+}

@@ -13,5 +13,9 @@ export function resolveCommand(command) {
         return { type: 'help' };
     }
 
+    if (command === 'settings' || command === 'set') {
+        return { type: 'settings' };
+    }
+
     return { type: 'unknown', command };
 }

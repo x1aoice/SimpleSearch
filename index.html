@@ -22,10 +22,10 @@
     </form>
   </main>
 
-  <section id="help-panel" class="help-panel" aria-label="帮助" hidden>
-    <div class="help-header">
+  <section id="help-panel" class="panel help-panel" aria-label="帮助" hidden>
+    <div class="panel-header">
       <h1>SimpleSearch</h1>
-      <button id="help-close" class="icon-button" type="button" aria-label="关闭帮助">×</button>
+      <button id="help-close" class="icon-button" type="button" aria-label="关闭帮助">x</button>
     </div>
     <div class="help-content">
       <div>
@@ -42,6 +42,24 @@
       </div>
     </div>
   </section>
+
+  <section id="settings-panel" class="panel settings-panel" aria-label="设置" hidden>
+    <div class="panel-header">
+      <h1>设置</h1>
+      <button id="settings-close" class="icon-button" type="button" aria-label="关闭设置">x</button>
+    </div>
+    <div class="settings-content">
+      <section class="settings-group">
+        <h2>搜索引擎</h2>
+        <div id="settings-engines" class="choice-grid"></div>
+      </section>
+      <section class="settings-group">
+        <h2>主题</h2>
+        <div id="settings-themes" class="choice-row"></div>
+      </section>
+    </div>
+  </section>
+
   <script type="module" src="src/app.js"></script>
 </body>
 
