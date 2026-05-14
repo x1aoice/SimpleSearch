@@ -76,6 +76,11 @@ test('limits custom engine URL length', () => {
 
 test('rejects reserved, duplicate, and invalid engines', () => {
     assert.equal(validateCustomEngine({
+        key: 'add',
+        label: 'Add',
+        template: 'https://example.com?q=%s',
+    }).ok, false);
+    assert.equal(validateCustomEngine({
         key: 'g',
         label: 'Google again',
         template: 'https://example.com?q=%s',

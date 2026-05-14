@@ -16,6 +16,7 @@ test('uses http for local targets', () => {
 
 test('rejects invalid or unsafe URL-like input', () => {
     assert.equal(isValidURL('javascript://alert(1)'), false);
+    assert.equal(isValidURL('ftp://example.com'), false);
     assert.equal(isValidURL('999.999.999.999'), false);
     assert.equal(getURLTarget('hello world'), null);
 });

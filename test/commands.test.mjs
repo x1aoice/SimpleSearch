@@ -28,10 +28,11 @@ test('resolves utility commands', () => {
     assert.deepEqual(resolveCommand('dark'), { type: 'theme', theme: 'dark' });
     assert.deepEqual(resolveCommand('light'), { type: 'theme', theme: 'light' });
     assert.deepEqual(resolveCommand('help'), { type: 'help' });
-    assert.deepEqual(resolveCommand('settings'), { type: 'settings' });
-    assert.deepEqual(resolveCommand('set'), { type: 'settings' });
+    assert.deepEqual(resolveCommand('add'), { type: 'settings' });
 });
 
 test('keeps unknown slash text searchable', () => {
     assert.deepEqual(resolveCommand('unknown'), { type: 'unknown', command: 'unknown' });
+    assert.deepEqual(resolveCommand('set'), { type: 'unknown', command: 'set' });
+    assert.deepEqual(resolveCommand('settings'), { type: 'unknown', command: 'settings' });
 });

@@ -3,12 +3,11 @@ import { safeGetItem, safeSetItem } from './storage.js';
 
 const RESERVED_COMMANDS = new Set([
     ...Object.keys(SEARCH_ENGINES),
+    'add',
     'dark',
     'h',
     'help',
     'light',
-    'set',
-    'settings',
 ]);
 export const CUSTOM_ENGINE_TEMPLATE_MAX_LENGTH = 2048;
 export const DEFAULT_CUSTOM_ENGINE_COLOR = '#111111';
@@ -51,27 +50,29 @@ export function validateCustomEngine(input, existingEngines = [], editingKey = '
     const color = String(input.color ?? DEFAULT_CUSTOM_ENGINE_COLOR).trim();
 
     if (!/^[a-z0-9]{1,16}$/.test(key)) {
-        return { ok: false, message: '命令只能使用 1-16 个小写字母或数字。' };
+        return validationError('customEngineCommandInvalid');
     }
 
     if (RESERVED_COMMANDS.has(key)) {
-        return { ok: false, message: '这个命令已被占用。' };
+        return validationError('customEngineCommandReserved');
     }
 
     if (existingEngines.some(engine => engine.key === key && engine.key !== editingKey)) {
-        return { ok: false, message: '这个命令已存在。' };
+        return validationError('customEngineCommandDuplicate');
     }
 
     if (!label || label.length > 32) {
-        return { ok: false, message: '名称需要 1-32 个字符。' };
+        return validationError('customEngineNameInvalid');
     }
 
-    if (!rawTemplate) return { ok: false, message: 'URL 不能为空。' };
-    if (template.length > CUSTOM_ENGINE_TEMPLATE_MAX_LENGTH) return { ok: false, message: `URL 不能超过 ${CUSTOM_ENGINE_TEMPLATE_MAX_LENGTH} 个字符。` };
-    if (!isHttpTemplate(template)) return { ok: false, message: 'URL 只支持 http:// 或 https://。' };
-    if (!template.includes('%s')) return { ok: false, message: 'URL 中用 %s 代替搜索字词。' };
-    if (!isValidTemplateURL(template)) return { ok: false, message: 'URL 格式无效。' };
-    if (!isValidColor(color)) return { ok: false, message: '颜色格式无效。' };
+    if (!rawTemplate) return validationError('customEngineUrlRequired');
+    if (template.length > CUSTOM_ENGINE_TEMPLATE_MAX_LENGTH) {
+        return validationError('customEngineUrlTooLong', [String(CUSTOM_ENGINE_TEMPLATE_MAX_LENGTH)]);
+    }
+    if (!isHttpTemplate(template)) return validationError('customEngineUrlProtocolInvalid');
+    if (!template.includes('%s')) return validationError('customEngineUrlTokenRequired');
+    if (!isValidTemplateURL(template)) return validationError('customEngineUrlInvalid');
+    if (!isValidColor(color)) return validationError('customEngineColorInvalid');
 
     return {
         ok: true,
@@ -82,6 +83,10 @@ export function validateCustomEngine(input, existingEngines = [], editingKey = '
             color: color.toLowerCase(),
         },
     };
+}
+
+function validationError(messageKey, substitutions = []) {
+    return { ok: false, messageKey, substitutions };
 }
 
 function normalizeTemplate(template) {

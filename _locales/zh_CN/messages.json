@@ -1,0 +1,144 @@
+{
+  "extName": {
+    "message": "SimpleSearch"
+  },
+  "extShortName": {
+    "message": "SimpleSearch"
+  },
+  "extDescription": {
+    "message": "极简终端风格的新标签页搜索启动器。"
+  },
+  "pageDescription": {
+    "message": "带命令和自定义搜索引擎的极简桌面搜索启动器。"
+  },
+  "search": {
+    "message": "搜索"
+  },
+  "searchWithEngine": {
+    "message": "搜索 $engine$",
+    "placeholders": {
+      "engine": {
+        "content": "$1"
+      }
+    }
+  },
+  "help": {
+    "message": "帮助"
+  },
+  "searchEngines": {
+    "message": "搜索引擎"
+  },
+  "commands": {
+    "message": "命令"
+  },
+  "shortcuts": {
+    "message": "快捷键"
+  },
+  "customSearchEngines": {
+    "message": "自定义搜索引擎"
+  },
+  "command": {
+    "message": "命令"
+  },
+  "name": {
+    "message": "名称"
+  },
+  "urlTemplateLabel": {
+    "message": "URL（用 %s 代替搜索字词）"
+  },
+  "color": {
+    "message": "颜色"
+  },
+  "flashColor": {
+    "message": "闪烁颜色"
+  },
+  "add": {
+    "message": "添加"
+  },
+  "save": {
+    "message": "保存"
+  },
+  "edit": {
+    "message": "编辑"
+  },
+  "cancelEdit": {
+    "message": "取消编辑"
+  },
+  "emptyCustomEngines": {
+    "message": "还没有自定义搜索引擎"
+  },
+  "editEngine": {
+    "message": "编辑 $engine$",
+    "placeholders": {
+      "engine": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteEngine": {
+    "message": "删除 $engine$",
+    "placeholders": {
+      "engine": {
+        "content": "$1"
+      }
+    }
+  },
+  "editingEngine": {
+    "message": "正在编辑 /$key$",
+    "placeholders": {
+      "key": {
+        "content": "$1"
+      }
+    }
+  },
+  "commandOpenHelp": {
+    "message": "打开帮助"
+  },
+  "commandAddEngine": {
+    "message": "添加搜索引擎"
+  },
+  "commandDarkTheme": {
+    "message": "深色主题"
+  },
+  "commandLightTheme": {
+    "message": "浅色主题"
+  },
+  "shortcutForceSearch": {
+    "message": "强制搜索当前输入"
+  },
+  "customEngineCommandInvalid": {
+    "message": "命令只能使用 1-16 个小写字母或数字。"
+  },
+  "customEngineCommandReserved": {
+    "message": "这个命令已被占用。"
+  },
+  "customEngineCommandDuplicate": {
+    "message": "这个命令已存在。"
+  },
+  "customEngineNameInvalid": {
+    "message": "名称需要 1-32 个字符。"
+  },
+  "customEngineUrlRequired": {
+    "message": "URL 不能为空。"
+  },
+  "customEngineUrlTooLong": {
+    "message": "URL 不能超过 $max$ 个字符。",
+    "placeholders": {
+      "max": {
+        "content": "$1"
+      }
+    }
+  },
+  "customEngineUrlProtocolInvalid": {
+    "message": "URL 只支持 http:// 或 https://。"
+  },
+  "customEngineUrlTokenRequired": {
+    "message": "URL 中用 %s 代替搜索字词。"
+  },
+  "customEngineUrlInvalid": {
+    "message": "URL 格式无效。"
+  },
+  "customEngineColorInvalid": {
+    "message": "颜色格式无效。"
+  }
+}

@@ -3,7 +3,6 @@ import {
     COMMAND_HELP,
     DEFAULT_ENGINE_KEY,
     DEFAULT_THEME,
-    SEARCH_ENGINES,
     SHORTCUT_HELP,
     STORAGE_KEYS,
 } from './config.js';
@@ -17,6 +16,7 @@ import {
 } from './custom-engines.js';
 import { getSearchTarget, getURLTarget } from './url.js';
 import { safeGetItem, safeRemoveItem, safeSetItem } from './storage.js';
+import { applyI18n, t } from './i18n.js';
 
 const inputElement = document.getElementById('q');
 const formElement = document.getElementById('search-form');
@@ -43,7 +43,6 @@ let currentEngineKey = DEFAULT_ENGINE_KEY;
 let customEngines = loadCustomEngines();
 let searchEngines = toEngineMap(customEngines);
 let currentEngine = searchEngines[currentEngineKey];
-let currentTheme = DEFAULT_THEME;
 let editingCustomEngineKey = '';
 let blinkTimer = null;
 let jumpTimer = null;
@@ -62,9 +61,10 @@ function updateUI() {
 
     const textWidth = measureElement.getBoundingClientRect().width;
     const wrapperWidth = inputWrapper.clientWidth;
+    const caretWidth = caretElement.offsetWidth || 18;
     const offset = value.length ? CARET_OFFSET : 0;
     const caretPosition = textWidth + offset - inputElement.scrollLeft;
-    const clampedPosition = Math.max(0, Math.min(caretPosition, wrapperWidth - 18));
+    const clampedPosition = Math.max(0, Math.min(caretPosition, wrapperWidth - caretWidth));
 
     caretElement.style.transform = `translate(${clampedPosition}px, -50%) scale(1.3, 0.85)`;
 
@@ -95,7 +95,7 @@ function renderDefinitionList(element, items) {
         const term = document.createElement('dt');
         const description = document.createElement('dd');
         term.textContent = item.keys;
-        description.textContent = item.description;
+        description.textContent = item.descriptionKey ? t(item.descriptionKey) : item.description;
         element.append(term, description);
     }
 }
@@ -120,7 +120,7 @@ function renderCustomEngines() {
     if (!customEngines.length) {
         const emptyState = document.createElement('div');
         emptyState.className = 'custom-engine-empty';
-        emptyState.textContent = '还没有自定义搜索引擎';
+        emptyState.textContent = t('emptyCustomEngines');
         customEngineListElement.replaceChildren(emptyState);
         return;
     }
@@ -147,12 +147,12 @@ function renderCustomEngines() {
             editButton.className = 'choice-button edit-engine-button';
             editButton.type = 'button';
             editButton.dataset.editEngine = engine.key;
-            editButton.ariaLabel = `编辑 ${engine.label}`;
-            editButton.textContent = '编辑';
+            editButton.ariaLabel = t('editEngine', [engine.label]);
+            editButton.textContent = t('edit');
             deleteButton.className = 'choice-button delete-engine-button';
             deleteButton.type = 'button';
             deleteButton.dataset.deleteEngine = engine.key;
-            deleteButton.ariaLabel = `删除 ${engine.label}`;
+            deleteButton.ariaLabel = t('deleteEngine', [engine.label]);
             deleteButton.textContent = '×';
 
             row.append(key, label, color, template, editButton, deleteButton);
@@ -184,6 +184,7 @@ function setSearchEngine(key, savePreference = true, animate = true) {
     currentEngine = engine;
     formElement.action = engine.action || '';
     inputElement.name = engine.param || 'q';
+    inputElement.setAttribute('aria-label', t('searchWithEngine', [engine.label]));
     document.body.style.setProperty('--flash-color', engine.color);
     resetInputState();
 
@@ -208,8 +209,6 @@ function setSearchEngine(key, savePreference = true, animate = true) {
 }
 
 function setTheme(theme, savePreference = true) {
-    currentTheme = theme;
-
     if (theme === 'dark') {
         document.body.classList.add('dark');
         document.body.classList.remove('light-forced');
@@ -229,12 +228,6 @@ function setTheme(theme, savePreference = true) {
     }
 
     setTimeout(updateUI, 50);
-}
-
-function triggerShake() {
-    inputWrapper.classList.remove('shake');
-    void inputWrapper.offsetWidth;
-    inputWrapper.classList.add('shake');
 }
 
 function triggerRecoil() {
@@ -288,7 +281,7 @@ function resetCustomEngineForm() {
     customEngineColorInput.value = DEFAULT_CUSTOM_ENGINE_COLOR;
     customEngineForm.classList.remove('editing');
     customEngineKeyInput.disabled = false;
-    customEngineSubmitButton.textContent = '添加';
+    customEngineSubmitButton.textContent = t('add');
     customEngineCancelButton.hidden = true;
     customEngineStateElement.textContent = '';
     customEngineErrorElement.textContent = '';
@@ -305,9 +298,9 @@ function editCustomEngine(key) {
     customEngineTemplateInput.value = engine.template;
     customEngineColorInput.value = engine.color;
     customEngineForm.classList.add('editing');
-    customEngineSubmitButton.textContent = '保存';
+    customEngineSubmitButton.textContent = t('save');
     customEngineCancelButton.hidden = false;
-    customEngineStateElement.textContent = `正在编辑 /${engine.key}`;
+    customEngineStateElement.textContent = t('editingEngine', [engine.key]);
     customEngineErrorElement.textContent = '';
     renderCustomEngines();
     customEngineKeyInput.focus();
@@ -326,7 +319,7 @@ function saveCustomEngine() {
     );
 
     if (!result.ok) {
-        customEngineErrorElement.textContent = result.message;
+        customEngineErrorElement.textContent = t(result.messageKey, result.substitutions);
         return;
     }
 
@@ -417,6 +410,7 @@ formElement.addEventListener('submit', event => {
 window.addEventListener('pageshow', () => {
     document.body.classList.remove('departing');
     caretElement.classList.add('blink');
+    inputElement.focus();
 });
 
 window.addEventListener('resize', () => {
@@ -426,7 +420,6 @@ window.addEventListener('resize', () => {
 
 inputElement.addEventListener('scroll', updateUI);
 inputElement.addEventListener('focus', updateUI);
-inputWrapper.addEventListener('animationend', () => inputWrapper.classList.remove('shake'));
 customEngineForm.addEventListener('submit', event => {
     event.preventDefault();
     saveCustomEngine();
@@ -453,6 +446,7 @@ document.addEventListener('click', event => {
     inputElement.focus();
 });
 
+applyI18n();
 renderHelp();
 renderSettings();
 
@@ -465,6 +459,8 @@ if (searchEngines[savedEngine]) {
 
 const savedTheme = safeGetItem(localStorage, STORAGE_KEYS.theme);
 setTheme(['dark', 'light'].includes(savedTheme) ? savedTheme : DEFAULT_THEME, false);
+
+requestAnimationFrame(() => document.body.classList.add('theme-ready'));
 
 setTimeout(() => {
     syncMeasureStyles();

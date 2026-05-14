@@ -1,0 +1,144 @@
+{
+  "extName": {
+    "message": "SimpleSearch"
+  },
+  "extShortName": {
+    "message": "SimpleSearch"
+  },
+  "extDescription": {
+    "message": "A minimalist terminal-style search launcher for your new tab page."
+  },
+  "pageDescription": {
+    "message": "A minimalist desktop search launcher with commands and custom search engines."
+  },
+  "search": {
+    "message": "Search"
+  },
+  "searchWithEngine": {
+    "message": "Search $engine$",
+    "placeholders": {
+      "engine": {
+        "content": "$1"
+      }
+    }
+  },
+  "help": {
+    "message": "Help"
+  },
+  "searchEngines": {
+    "message": "Search Engines"
+  },
+  "commands": {
+    "message": "Commands"
+  },
+  "shortcuts": {
+    "message": "Shortcuts"
+  },
+  "customSearchEngines": {
+    "message": "Custom Search Engines"
+  },
+  "command": {
+    "message": "Command"
+  },
+  "name": {
+    "message": "Name"
+  },
+  "urlTemplateLabel": {
+    "message": "URL (use %s for search terms)"
+  },
+  "color": {
+    "message": "Color"
+  },
+  "flashColor": {
+    "message": "Flash color"
+  },
+  "add": {
+    "message": "Add"
+  },
+  "save": {
+    "message": "Save"
+  },
+  "edit": {
+    "message": "Edit"
+  },
+  "cancelEdit": {
+    "message": "Cancel Edit"
+  },
+  "emptyCustomEngines": {
+    "message": "No custom search engines yet"
+  },
+  "editEngine": {
+    "message": "Edit $engine$",
+    "placeholders": {
+      "engine": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteEngine": {
+    "message": "Delete $engine$",
+    "placeholders": {
+      "engine": {
+        "content": "$1"
+      }
+    }
+  },
+  "editingEngine": {
+    "message": "Editing /$key$",
+    "placeholders": {
+      "key": {
+        "content": "$1"
+      }
+    }
+  },
+  "commandOpenHelp": {
+    "message": "Open help"
+  },
+  "commandAddEngine": {
+    "message": "Add search engine"
+  },
+  "commandDarkTheme": {
+    "message": "Dark theme"
+  },
+  "commandLightTheme": {
+    "message": "Light theme"
+  },
+  "shortcutForceSearch": {
+    "message": "Force search the current input"
+  },
+  "customEngineCommandInvalid": {
+    "message": "Command must be 1-16 lowercase letters or numbers."
+  },
+  "customEngineCommandReserved": {
+    "message": "This command is already reserved."
+  },
+  "customEngineCommandDuplicate": {
+    "message": "This command already exists."
+  },
+  "customEngineNameInvalid": {
+    "message": "Name must be 1-32 characters."
+  },
+  "customEngineUrlRequired": {
+    "message": "URL is required."
+  },
+  "customEngineUrlTooLong": {
+    "message": "URL must be $max$ characters or less.",
+    "placeholders": {
+      "max": {
+        "content": "$1"
+      }
+    }
+  },
+  "customEngineUrlProtocolInvalid": {
+    "message": "URL only supports http:// or https://."
+  },
+  "customEngineUrlTokenRequired": {
+    "message": "Use %s in the URL for search terms."
+  },
+  "customEngineUrlInvalid": {
+    "message": "URL format is invalid."
+  },
+  "customEngineColorInvalid": {
+    "message": "Color format is invalid."
+  }
+}

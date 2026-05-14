@@ -2,14 +2,17 @@
 
 SimpleSearch is a minimalist desktop search launcher. It keeps the page quiet: type, press Enter, and move on.
 
+It can also run as a Chrome/Edge new tab extension.
+
 ## Features
 
 - Multi-engine search with slash commands.
+- Automatic English/Chinese UI based on the browser language.
 - Direct URL, domain, IP, and localhost navigation.
 - `Shift+Enter` to force search when an IP or domain should be searched instead of opened.
 - System, light, and dark themes.
 - Built-in `/help` panel.
-- Built-in `/set` panel for custom search engines.
+- Built-in `/add` panel for custom search engines.
 - Custom search engines with `%s` URL templates, editing, and deletion.
 
 ## Commands
@@ -26,13 +29,13 @@ Type a command and press Space.
 | `/dark` | Dark theme |
 | `/light` | Light theme |
 | `/help` | Open help |
-| `/set` | Open settings |
+| `/add` | Add custom search engines |
 
 Slash text is still searchable. For example, `/b` + Enter searches `/b`; only `/b` + Space runs the command.
 
 ## Custom Search Engines
 
-Open `/set`, then add a command, name, and URL template. Use `%s` where the typed search text should go. If the protocol is omitted, SimpleSearch saves it with `https://`.
+Open `/add`, then add a command, name, and URL template. Use `%s` where the typed search text should go. If the protocol is omitted, SimpleSearch saves it with `https://`.
 
 ```text
 Command: mdn
@@ -48,6 +51,35 @@ Then use it like:
 
 Use the edit button in settings to update a custom engine's name, URL, or flash color. Delete removes it from the local configuration.
 
+## Browser Extension
+
+SimpleSearch ships as a Manifest V3 new tab extension with no requested permissions.
+The extension uses Chrome's built-in `_locales` system, so Chrome/Edge will choose English or Simplified Chinese automatically from the browser language.
+
+To load it in Chrome or Edge:
+
+1. Open `chrome://extensions` or `edge://extensions`.
+2. Enable developer mode.
+3. Choose `Load unpacked`.
+4. Select this project folder.
+
+After loading, opening a new tab will show SimpleSearch.
+
+To create a Chrome Web Store upload ZIP:
+
+```powershell
+npm run verify
+npm run package:extension
+```
+
+Then upload:
+
+```text
+dist/SimpleSearch-1.0.0.zip
+```
+
+Store listing copy, privacy answers, and asset notes are in `docs/store-listing.md`. The privacy policy draft is in `PRIVACY.md`.
+
 ## Shortcuts
 
 | Shortcut | Action |
@@ -60,18 +92,27 @@ Use the edit button in settings to update a custom engine's name, URL, or flash 
 SimpleSearch/
 ├─ .editorconfig
 ├─ index.html
+├─ manifest.json
+├─ _locales/
+├─ docs/
 ├─ styles.css
 ├─ favicon.svg
+├─ icons/
+├─ scripts/
+├─ store-assets/
 ├─ src/
 │  ├─ app.js
 │  ├─ commands.js
 │  ├─ config.js
 │  ├─ custom-engines.js
+│  ├─ i18n.js
 │  ├─ storage.js
 │  └─ url.js
 └─ test/
    ├─ commands.test.mjs
    ├─ custom-engines.test.mjs
+   ├─ extension.test.mjs
+   ├─ i18n.test.mjs
    ├─ source-text.test.mjs
    └─ url.test.mjs
 ```

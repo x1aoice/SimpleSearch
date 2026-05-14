@@ -13,7 +13,7 @@ export function resolveCommand(command, engines = SEARCH_ENGINES) {
         return { type: 'help' };
     }
 
-    if (command === 'settings' || command === 'set') {
+    if (command === 'add') {
         return { type: 'settings' };
     }
 

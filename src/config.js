@@ -9,7 +9,7 @@ export const SEARCH_ENGINES = {
 export const DEFAULT_ENGINE_KEY = 'g';
 export const DEFAULT_THEME = 'system';
 export const CARET_OFFSET = 15;
-export const SAFE_PROTOCOLS = new Set(['http', 'https', 'ftp', 'ftps']);
+export const SAFE_PROTOCOLS = new Set(['http', 'https']);
 
 export const STORAGE_KEYS = {
     customEngines: 'customSearchEngines',
@@ -18,12 +18,12 @@ export const STORAGE_KEYS = {
 };
 
 export const COMMAND_HELP = [
-    { keys: '/help', description: '打开帮助' },
-    { keys: '/set', description: '打开设置' },
-    { keys: '/dark', description: '深色主题' },
-    { keys: '/light', description: '浅色主题' },
+    { keys: '/help', descriptionKey: 'commandOpenHelp' },
+    { keys: '/add', descriptionKey: 'commandAddEngine' },
+    { keys: '/dark', descriptionKey: 'commandDarkTheme' },
+    { keys: '/light', descriptionKey: 'commandLightTheme' },
 ];
 
 export const SHORTCUT_HELP = [
-    { keys: 'Shift+Enter', description: '强制搜索当前输入' },
+    { keys: 'Shift+Enter', descriptionKey: 'shortcutForceSearch' },
 ];

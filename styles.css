@@ -10,12 +10,10 @@
   --text: #1a1a1a;
   --muted: #777777;
   --ghost: #a0a0a0;
-  --surface: rgba(255, 255, 255, 0.92);
   --surface-border: rgba(15, 23, 42, 0.12);
   --field-bg: rgba(15, 23, 42, 0.025);
   --danger: #b42318;
   --caret-color: #1a1a1a;
-  --glow: rgba(0, 0, 0, 0.05);
 }
 
 body.dark {
@@ -23,12 +21,10 @@ body.dark {
   --text: #f0f0f0;
   --muted: #a1a1aa;
   --ghost: #63636b;
-  --surface: rgba(18, 18, 22, 0.94);
   --surface-border: rgba(255, 255, 255, 0.14);
   --field-bg: rgba(255, 255, 255, 0.035);
   --danger: #ff8a80;
   --caret-color: #f0f0f0;
-  --glow: rgba(255, 255, 255, 0.15);
 }
 
 * {
@@ -47,6 +43,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
   opacity: 1;
   transform: scale(1);
+  transition: none;
+}
+
+body.theme-ready {
   transition: background 0.5s ease, opacity 0.4s ease, transform 0.4s cubic-bezier(0.2, 0, 0, 1);
 }
 
@@ -116,7 +116,7 @@ form {
   left: 0;
   top: 50%;
   z-index: 3;
-  width: 14px;
+  width: 1ch;
   height: 1.1em;
   border-radius: 0;
   background: var(--caret-color);
@@ -259,7 +259,7 @@ form {
 
 .custom-engine-form {
   display: grid;
-  grid-template-columns: 8ch 16ch minmax(32ch, 1fr) 12ch 9ch;
+  grid-template-columns: minmax(84px, 0.7fr) minmax(132px, 1fr) minmax(320px, 3fr) minmax(104px, 0.8fr) auto;
   gap: 10px;
   align-items: end;
 }
@@ -392,10 +392,6 @@ form {
   animation: flash-color 0.5s ease forwards;
 }
 
-.shake {
-  animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-}
-
 @keyframes blink {
   0%,
   100% {
@@ -425,39 +421,12 @@ form {
   }
 }
 
-@keyframes shake {
-  10%,
-  90% {
-    transform: translate3d(-1px, 0, 0);
-  }
-
-  20%,
-  80% {
-    transform: translate3d(2px, 0, 0);
-  }
-
-  30%,
-  50%,
-  70% {
-    transform: translate3d(-3px, 0, 0);
-  }
-
-  40%,
-  60% {
-    transform: translate3d(3px, 0, 0);
-  }
-}
-
 @media (min-width: 1800px) {
   :root {
     --font-size: 72px;
     --container-width: 1160px;
     --panel-width: 1040px;
     --settings-width: 1040px;
-  }
-
-  .idle-caret {
-    width: 18px;
   }
 }
 
@@ -468,7 +437,7 @@ form {
   }
 
   .custom-engine-form {
-    grid-template-columns: 76px 112px minmax(220px, 1fr) 86px 68px;
+    grid-template-columns: minmax(76px, 0.8fr) minmax(112px, 1fr) minmax(250px, 2fr) minmax(90px, 0.8fr) auto;
     gap: 8px;
   }
 
@@ -494,12 +463,10 @@ form {
     --text: #f0f0f0;
     --muted: #a1a1aa;
     --ghost: #63636b;
-    --surface: rgba(18, 18, 22, 0.94);
     --surface-border: rgba(255, 255, 255, 0.14);
     --field-bg: rgba(255, 255, 255, 0.035);
     --danger: #ff8a80;
     --caret-color: #f0f0f0;
-    --glow: rgba(255, 255, 255, 0.15);
   }
 }
 
@@ -516,7 +483,7 @@ form {
     transition: none;
   }
 
-  body {
+  body.theme-ready {
     transition: background 0.01ms;
   }
 }

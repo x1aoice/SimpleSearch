@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="A minimalist desktop search launcher with commands and custom search engines.">
+  <meta name="description" content="A minimalist desktop search launcher with commands and custom search engines." data-i18n-content="pageDescription">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="styles.css">
   <title>SimpleSearch</title>
@@ -16,55 +16,55 @@
       <div class="input-wrapper">
         <div id="measure" class="measure typo"></div>
         <div class="idle-caret"></div>
-        <input id="q" type="text" name="q" class="typo" autofocus autocomplete="off" spellcheck="false" aria-label="搜索">
+        <input id="q" type="text" name="q" class="typo" autofocus autocomplete="off" spellcheck="false" aria-label="Search" data-i18n-aria-label="search">
       </div>
     </form>
   </main>
 
-  <section id="help-panel" class="panel help-panel" aria-label="帮助" hidden>
+  <section id="help-panel" class="panel help-panel" aria-label="Help" data-i18n-aria-label="help" hidden>
     <div class="help-content">
       <div>
-        <h2>搜索引擎</h2>
+        <h2 data-i18n="searchEngines">Search Engines</h2>
         <dl id="engine-help" class="help-list"></dl>
       </div>
       <div>
-        <h2>命令</h2>
+        <h2 data-i18n="commands">Commands</h2>
         <dl id="command-help" class="help-list"></dl>
       </div>
       <div>
-        <h2>快捷键</h2>
+        <h2 data-i18n="shortcuts">Shortcuts</h2>
         <dl id="shortcut-help" class="help-list"></dl>
       </div>
     </div>
   </section>
 
-  <section id="settings-panel" class="panel settings-panel" aria-label="设置" hidden>
+  <section id="settings-panel" class="panel settings-panel" aria-label="Custom Search Engines" data-i18n-aria-label="customSearchEngines" hidden>
     <div class="settings-content">
       <section class="settings-group custom-engine-section">
         <div class="settings-group-header">
-          <h2>自定义搜索引擎</h2>
+          <h2 data-i18n="customSearchEngines">Custom Search Engines</h2>
           <p id="custom-engine-state" class="custom-engine-state" aria-live="polite"></p>
         </div>
         <form id="custom-engine-form" class="custom-engine-form" autocomplete="off">
-          <label>
-            <span>命令</span>
+          <label for="custom-engine-key">
+            <span data-i18n="command">Command</span>
             <input id="custom-engine-key" type="text" maxlength="16" spellcheck="false" autocomplete="off" placeholder="site">
           </label>
-          <label>
-            <span>名称</span>
-            <input id="custom-engine-label" type="text" maxlength="32" spellcheck="false" autocomplete="off" placeholder="搜索">
+          <label for="custom-engine-label">
+            <span data-i18n="name">Name</span>
+            <input id="custom-engine-label" type="text" maxlength="32" spellcheck="false" autocomplete="off" placeholder="Search" data-i18n-placeholder="search">
           </label>
-          <label class="template-field">
-            <span>URL（用 %s 代替搜索字词）</span>
+          <label for="custom-engine-template" class="template-field">
+            <span data-i18n="urlTemplateLabel">URL (use %s for search terms)</span>
             <input id="custom-engine-template" type="text" maxlength="2048" spellcheck="false" autocomplete="off" placeholder="https://search.example.com?q=%s">
           </label>
-          <label class="color-field">
-            <span>颜色</span>
-            <input id="custom-engine-color" type="text" maxlength="7" spellcheck="false" autocomplete="off" value="#111111" placeholder="#ff8800" aria-label="闪烁颜色">
+          <label for="custom-engine-color" class="color-field">
+            <span data-i18n="color">Color</span>
+            <input id="custom-engine-color" type="text" maxlength="7" spellcheck="false" autocomplete="off" value="#111111" placeholder="#ff8800" aria-label="Flash color" data-i18n-aria-label="flashColor">
           </label>
-          <button id="custom-engine-submit" class="choice-button add-engine-button" type="submit">添加</button>
+          <button id="custom-engine-submit" class="choice-button add-engine-button" type="submit" data-i18n="add">Add</button>
         </form>
-        <button id="custom-engine-cancel" class="choice-button cancel-engine-button" type="button" hidden>取消编辑</button>
+        <button id="custom-engine-cancel" class="choice-button cancel-engine-button" type="button" hidden data-i18n="cancelEdit">Cancel Edit</button>
         <div id="custom-engine-error" class="custom-engine-error" aria-live="polite" role="alert"></div>
         <div id="custom-engine-list" class="custom-engine-list"></div>
       </section>
