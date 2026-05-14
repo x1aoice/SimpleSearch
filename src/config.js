@@ -23,3 +23,7 @@ export const COMMAND_HELP = [
     { keys: '/dark', description: '深色主题' },
     { keys: '/light', description: '浅色主题' },
 ];
+
+export const SHORTCUT_HELP = [
+    { keys: 'Shift+Enter', description: '强制搜索当前输入' },
+];

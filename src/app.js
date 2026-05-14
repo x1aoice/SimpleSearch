@@ -4,6 +4,7 @@ import {
     DEFAULT_ENGINE_KEY,
     DEFAULT_THEME,
     SEARCH_ENGINES,
+    SHORTCUT_HELP,
     STORAGE_KEYS,
 } from './config.js';
 import { resolveCommand } from './commands.js';
@@ -26,6 +27,7 @@ const helpPanel = document.getElementById('help-panel');
 const settingsPanel = document.getElementById('settings-panel');
 const engineHelpElement = document.getElementById('engine-help');
 const commandHelpElement = document.getElementById('command-help');
+const shortcutHelpElement = document.getElementById('shortcut-help');
 const customEngineForm = document.getElementById('custom-engine-form');
 const customEngineKeyInput = document.getElementById('custom-engine-key');
 const customEngineLabelInput = document.getElementById('custom-engine-label');
@@ -107,6 +109,7 @@ function renderHelp() {
         })),
     );
     renderDefinitionList(commandHelpElement, COMMAND_HELP);
+    renderDefinitionList(shortcutHelpElement, SHORTCUT_HELP);
 }
 
 function renderSettings() {
