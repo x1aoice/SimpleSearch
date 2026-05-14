@@ -57,8 +57,10 @@ body.departing {
 }
 
 .shell {
+  display: flex;
+  align-items: center;
   min-height: 100dvh;
-  padding: 28dvh 40px 0;
+  padding: 0 40px;
 }
 
 form {
@@ -477,10 +479,6 @@ form {
 }
 
 @media (max-height: 560px) {
-  .shell {
-    padding-top: 14dvh;
-  }
-
   .input-wrapper {
     height: 96px;
   }
