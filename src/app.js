@@ -45,7 +45,6 @@ let searchEngines = toEngineMap(customEngines);
 let currentEngine = searchEngines[currentEngineKey];
 let editingCustomEngineKey = '';
 let blinkTimer = null;
-let jumpTimer = null;
 
 function syncMeasureStyles() {
     const computedStyle = window.getComputedStyle(inputElement);
@@ -57,24 +56,25 @@ function syncMeasureStyles() {
 
 function updateUI() {
     const value = inputElement.value;
-    measureElement.textContent = value;
+    const cursorIndex = inputElement.selectionStart ?? value.length;
+    const hasSelection = inputElement.selectionStart !== inputElement.selectionEnd;
+    measureElement.textContent = value.slice(0, cursorIndex);
 
     const textWidth = measureElement.getBoundingClientRect().width;
     const wrapperWidth = inputWrapper.clientWidth;
     const caretWidth = caretElement.offsetWidth || 18;
-    const offset = value.length ? CARET_OFFSET : 0;
+    const offset = cursorIndex ? CARET_OFFSET : 0;
     const caretPosition = textWidth + offset - inputElement.scrollLeft;
     const clampedPosition = Math.max(0, Math.min(caretPosition, wrapperWidth - caretWidth));
 
-    caretElement.style.transform = `translate(${clampedPosition}px, -50%) scale(1.3, 0.85)`;
-
+    caretElement.style.setProperty('--caret-x', `${clampedPosition}px`);
     caretElement.classList.remove('blink');
-    caretElement.style.opacity = 1;
+    caretElement.style.opacity = hasSelection ? 0 : 1;
 
-    clearTimeout(jumpTimer);
-    jumpTimer = setTimeout(() => {
-        caretElement.style.transform = `translate(${clampedPosition}px, -50%) scale(1, 1)`;
-    }, 100);
+    if (hasSelection) {
+        clearTimeout(blinkTimer);
+        return;
+    }
 
     clearTimeout(blinkTimer);
     blinkTimer = setTimeout(() => {
@@ -194,7 +194,6 @@ function setSearchEngine(key, savePreference = true, animate = true) {
 
     if (!animate) return;
 
-    caretElement.style.transition = 'none';
     updateUI();
 
     caretElement.classList.remove('blink', 'flash-brand');
@@ -203,7 +202,6 @@ function setSearchEngine(key, savePreference = true, animate = true) {
 
     setTimeout(() => {
         caretElement.classList.remove('flash-brand');
-        caretElement.style.transition = 'transform 0.1s cubic-bezier(0.25, 1.5, 0.5, 1), background-color 0.2s, opacity 0.5s ease';
         caretElement.classList.add('blink');
     }, 500);
 }
@@ -363,13 +361,12 @@ function navigateFromInput(forceSearch = false) {
     setTimeout(() => {
         const urlTarget = forceSearch ? null : getURLTarget(value);
         window.location.href = urlTarget || getSearchTarget(currentEngine, value);
-    }, 300);
+    }, 400);
 
     return true;
 }
 
 inputElement.addEventListener('input', () => {
-    triggerRecoil();
     updateUI();
 });
 
@@ -378,7 +375,7 @@ inputElement.addEventListener('keydown', event => {
 
     if (event.key === 'Enter' && event.shiftKey) {
         event.preventDefault();
-        navigateFromInput(true);
+        if (navigateFromInput(true)) triggerRecoil();
         return;
     }
 
@@ -386,6 +383,7 @@ inputElement.addEventListener('keydown', event => {
         const command = value.slice(1).toLowerCase();
         if (executeCommand(command)) {
             event.preventDefault();
+            triggerRecoil();
             return;
         }
     }
@@ -404,7 +402,7 @@ inputElement.addEventListener('keydown', event => {
 
 formElement.addEventListener('submit', event => {
     event.preventDefault();
-    navigateFromInput();
+    if (navigateFromInput()) triggerRecoil();
 });
 
 window.addEventListener('pageshow', () => {
@@ -420,6 +418,9 @@ window.addEventListener('resize', () => {
 
 inputElement.addEventListener('scroll', updateUI);
 inputElement.addEventListener('focus', updateUI);
+document.addEventListener('selectionchange', () => {
+    if (document.activeElement === inputElement) updateUI();
+});
 customEngineForm.addEventListener('submit', event => {
     event.preventDefault();
     saveCustomEngine();

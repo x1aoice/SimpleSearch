@@ -14,6 +14,7 @@
   --field-bg: rgba(15, 23, 42, 0.025);
   --danger: #b42318;
   --caret-color: #1a1a1a;
+  --caret-x: 0px;
 }
 
 body.dark {
@@ -122,9 +123,9 @@ form {
   background: var(--caret-color);
   box-shadow: none;
   pointer-events: none;
-  transform: translate(0, -50%) scale(1);
+  transform: translate(var(--caret-x), -50%);
   transform-origin: left center;
-  transition: transform 0.1s cubic-bezier(0.25, 1.5, 0.5, 1), background-color 0.2s, opacity 0.5s ease;
+  transition: background-color 0.2s, opacity 0.5s ease;
   will-change: transform;
 }
 
@@ -406,18 +407,18 @@ form {
 @keyframes flash-color {
   0% {
     background: var(--caret-color);
-    transform: translate(0, -50%) scale(1);
+    transform: translate(var(--caret-x), -50%) scale(1);
   }
 
   30% {
     background: var(--flash-color);
     box-shadow: 0 0 50px var(--flash-color);
-    transform: translate(0, -50%) scale(1.4, 0.8);
+    transform: translate(var(--caret-x), -50%) scale(1.4, 0.8);
   }
 
   100% {
     background: var(--caret-color);
-    transform: translate(0, -50%) scale(1);
+    transform: translate(var(--caret-x), -50%) scale(1);
   }
 }
 
