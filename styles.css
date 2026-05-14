@@ -116,7 +116,7 @@ form {
   left: 0;
   top: 50%;
   z-index: 3;
-  width: 1ch;
+  width: 14px;
   height: 1.1em;
   border-radius: 0;
   background: var(--caret-color);
@@ -427,6 +427,10 @@ form {
     --container-width: 1160px;
     --panel-width: 1040px;
     --settings-width: 1040px;
+  }
+
+  .idle-caret {
+    width: 18px;
   }
 }
 
