@@ -24,6 +24,7 @@ test('keeps localized UI text wired through readable source files', async () => 
     assert.match(app, /style\.setProperty\('--caret-x'/);
     assert.match(app, /const hasSelection = inputElement\.selectionStart !== inputElement\.selectionEnd/);
     assert.match(app, /document\.addEventListener\('selectionchange'/);
+    assert.match(app, /event\.composedPath\?\.\(\)/);
     assert.match(app, /}, 400\)/);
     assert.doesNotMatch(app, /inputElement\.addEventListener\('input', \(\) => \{\s*triggerRecoil\(\);/);
     assert.doesNotMatch(app, /addEventListener\('keyup', updateUI\)/);

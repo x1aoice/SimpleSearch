@@ -166,6 +166,15 @@ function hidePanels() {
     settingsPanel.hidden = true;
 }
 
+function isPanelInteraction(event) {
+    const path = event.composedPath?.() || [];
+
+    return path.includes(helpPanel)
+        || path.includes(settingsPanel)
+        || helpPanel.contains(event.target)
+        || settingsPanel.contains(event.target);
+}
+
 function showHelp() {
     hidePanels();
     helpPanel.hidden = false;
@@ -442,7 +451,7 @@ customEngineListElement.addEventListener('click', event => {
 });
 
 document.addEventListener('click', event => {
-    if (helpPanel.contains(event.target) || settingsPanel.contains(event.target)) return;
+    if (isPanelInteraction(event)) return;
     if (!helpPanel.hidden || !settingsPanel.hidden) hidePanels();
     inputElement.focus();
 });
