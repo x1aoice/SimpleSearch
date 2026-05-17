@@ -51,3 +51,18 @@ export function getSearchTarget(engine, input) {
 
     return `${engine.action}?${engine.param}=${encodeURIComponent(input)}`;
 }
+
+export function getCommandSearch(input, engines) {
+    const match = input.trim().match(/^\/([a-z0-9]{1,16})\s+(.+)$/i);
+    if (!match) return null;
+
+    const engine = engines[match[1].toLowerCase()];
+    const query = match[2].trim();
+    if (!engine || !query) return null;
+
+    return {
+        engine,
+        query,
+        target: getSearchTarget(engine, query),
+    };
+}

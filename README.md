@@ -6,7 +6,8 @@ It can also run as a Chrome/Edge new tab extension.
 
 ## Features
 
-- Multi-engine search with slash commands.
+- Default searches use the browser's Chrome default search provider.
+- One-off multi-engine search with slash prefixes.
 - Automatic English/Chinese UI based on the browser language.
 - Direct URL, domain, IP, and localhost navigation.
 - `Shift+Enter` to force search when an IP or domain should be searched instead of opened.
@@ -17,21 +18,21 @@ It can also run as a Chrome/Edge new tab extension.
 
 ## Commands
 
-Type a command and press Space.
+Type a search prefix followed by a query, then press Enter.
 
 | Command | Action |
 | --- | --- |
-| `/g` | Google |
-| `/b` | Baidu |
-| `/bi` | Bing |
-| `/gh` | GitHub |
-| `/dg` | DuckDuckGo |
+| `/g cats` | Search Google |
+| `/b cats` | Search Baidu |
+| `/bi cats` | Search Bing |
+| `/gh cats` | Search GitHub |
+| `/dg cats` | Search DuckDuckGo |
 | `/dark` | Dark theme |
 | `/light` | Light theme |
 | `/help` | Open help |
 | `/add` | Add custom search engines |
 
-Slash text is still searchable. For example, `/b` + Enter searches `/b`; only `/b` + Space runs the command.
+Utility commands run when you type the command and press Space. Slash text is still searchable: `/b` + Enter searches `/b`, while `/b cats` searches Baidu for `cats`.
 
 ## Custom Search Engines
 
@@ -53,7 +54,7 @@ Use the edit button in settings to update a custom engine's name, URL, or flash 
 
 ## Browser Extension
 
-SimpleSearch ships as a Manifest V3 new tab extension with no requested permissions.
+SimpleSearch ships as a Manifest V3 new tab extension. It requests the `search` permission so normal searches can use Chrome's default search provider through the Chrome Search API.
 The extension uses Chrome's built-in `_locales` system, so Chrome/Edge will choose English or Simplified Chinese automatically from the browser language.
 
 To load it in Chrome or Edge:
@@ -75,7 +76,7 @@ npm run package:extension
 Then upload:
 
 ```text
-dist/SimpleSearch-1.0.0.zip
+dist/SimpleSearch-1.0.2.zip
 ```
 
 Store listing copy, privacy answers, and asset notes are in `docs/store-listing.md`. The privacy policy draft is in `PRIVACY.md`.
@@ -90,31 +91,33 @@ Store listing copy, privacy answers, and asset notes are in `docs/store-listing.
 
 ```text
 SimpleSearch/
-├─ .editorconfig
-├─ index.html
-├─ manifest.json
-├─ _locales/
-├─ docs/
-├─ styles.css
-├─ favicon.svg
-├─ icons/
-├─ scripts/
-├─ store-assets/
-├─ src/
-│  ├─ app.js
-│  ├─ commands.js
-│  ├─ config.js
-│  ├─ custom-engines.js
-│  ├─ i18n.js
-│  ├─ storage.js
-│  └─ url.js
-└─ test/
-   ├─ commands.test.mjs
-   ├─ custom-engines.test.mjs
-   ├─ extension.test.mjs
-   ├─ i18n.test.mjs
-   ├─ source-text.test.mjs
-   └─ url.test.mjs
+|-- .editorconfig
+|-- index.html
+|-- manifest.json
+|-- _locales/
+|-- docs/
+|-- styles.css
+|-- favicon.svg
+|-- icons/
+|-- scripts/
+|-- store-assets/
+|-- src/
+|   |-- app.js
+|   |-- commands.js
+|   |-- config.js
+|   |-- custom-engines.js
+|   |-- i18n.js
+|   |-- search.js
+|   |-- storage.js
+|   `-- url.js
+`-- test/
+    |-- commands.test.mjs
+    |-- custom-engines.test.mjs
+    |-- extension.test.mjs
+    |-- i18n.test.mjs
+    |-- search.test.mjs
+    |-- source-text.test.mjs
+    `-- url.test.mjs
 ```
 
 ## Development

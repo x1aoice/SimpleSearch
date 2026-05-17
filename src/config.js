@@ -13,7 +13,6 @@ export const SAFE_PROTOCOLS = new Set(['http', 'https']);
 
 export const STORAGE_KEYS = {
     customEngines: 'customSearchEngines',
-    engine: 'defaultSearchEngine',
     theme: 'theme',
 };
 

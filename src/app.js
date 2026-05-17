@@ -1,7 +1,6 @@
 import {
     CARET_OFFSET,
     COMMAND_HELP,
-    DEFAULT_ENGINE_KEY,
     DEFAULT_THEME,
     SHORTCUT_HELP,
     STORAGE_KEYS,
@@ -14,7 +13,8 @@ import {
     toEngineMap,
     validateCustomEngine,
 } from './custom-engines.js';
-import { getSearchTarget, getURLTarget } from './url.js';
+import { searchWithDefaultProvider } from './search.js';
+import { getCommandSearch, getURLTarget } from './url.js';
 import { safeGetItem, safeRemoveItem, safeSetItem } from './storage.js';
 import { applyI18n, t } from './i18n.js';
 
@@ -39,10 +39,8 @@ const customEngineStateElement = document.getElementById('custom-engine-state');
 const customEngineErrorElement = document.getElementById('custom-engine-error');
 const customEngineListElement = document.getElementById('custom-engine-list');
 
-let currentEngineKey = DEFAULT_ENGINE_KEY;
 let customEngines = loadCustomEngines();
 let searchEngines = toEngineMap(customEngines);
-let currentEngine = searchEngines[currentEngineKey];
 let editingCustomEngineKey = '';
 let blinkTimer = null;
 
@@ -104,7 +102,7 @@ function renderHelp() {
     renderDefinitionList(
         engineHelpElement,
         Object.entries(searchEngines).map(([key, engine]) => ({
-            keys: `/${key}`,
+            keys: `/${key} ...`,
             description: engine.label,
         })),
     );
@@ -185,24 +183,11 @@ function showSettings() {
     settingsPanel.hidden = false;
 }
 
-function setSearchEngine(key, savePreference = true, animate = true) {
+function previewSearchEngine(key) {
     const engine = searchEngines[key];
     if (!engine) return;
 
-    currentEngineKey = key;
-    currentEngine = engine;
-    formElement.action = engine.action || '';
-    inputElement.name = engine.param || 'q';
-    inputElement.setAttribute('aria-label', t('searchWithEngine', [engine.label]));
     document.body.style.setProperty('--flash-color', engine.color);
-    resetInputState();
-
-    if (savePreference) {
-        safeSetItem(localStorage, STORAGE_KEYS.engine, key);
-    }
-
-    if (!animate) return;
-
     updateUI();
 
     caretElement.classList.remove('blink', 'flash-brand');
@@ -247,7 +232,6 @@ function triggerRecoil() {
 function refreshCustomEngines(nextEngines) {
     customEngines = nextEngines;
     searchEngines = toEngineMap(customEngines);
-    currentEngine = searchEngines[currentEngineKey] || searchEngines[DEFAULT_ENGINE_KEY];
     saveCustomEngines(customEngines);
     renderHelp();
     renderSettings();
@@ -255,11 +239,6 @@ function refreshCustomEngines(nextEngines) {
 
 function executeCommand(command) {
     const result = resolveCommand(command, searchEngines);
-
-    if (result.type === 'engine') {
-        setSearchEngine(result.key);
-        return true;
-    }
 
     if (result.type === 'theme') {
         setTheme(result.theme);
@@ -330,27 +309,18 @@ function saveCustomEngine() {
         return;
     }
 
-    const editedEngineKey = editingCustomEngineKey;
-    const shouldKeepCurrentEngine = editedEngineKey && currentEngineKey === editedEngineKey;
-    const nextEngines = editedEngineKey
-        ? customEngines.map(engine => (engine.key === editedEngineKey ? result.engine : engine))
+    const nextEngines = editingCustomEngineKey
+        ? customEngines.map(engine => (engine.key === editingCustomEngineKey ? result.engine : engine))
         : [...customEngines, result.engine];
 
     customEngineErrorElement.textContent = '';
     refreshCustomEngines(nextEngines);
-    if (shouldKeepCurrentEngine) {
-        setSearchEngine(result.engine.key, true, false);
-    }
     resetCustomEngineForm();
     customEngineKeyInput.focus();
 }
 
 function deleteCustomEngine(key) {
     const nextEngines = customEngines.filter(engine => engine.key !== key);
-
-    if (currentEngineKey === key) {
-        setSearchEngine(DEFAULT_ENGINE_KEY);
-    }
 
     if (editingCustomEngineKey === key) {
         resetCustomEngineForm();
@@ -369,7 +339,21 @@ function navigateFromInput(forceSearch = false) {
 
     setTimeout(() => {
         const urlTarget = forceSearch ? null : getURLTarget(value);
-        window.location.href = urlTarget || getSearchTarget(currentEngine, value);
+        const commandSearch = forceSearch ? null : getCommandSearch(value, searchEngines);
+
+        if (urlTarget) {
+            window.location.href = urlTarget;
+            return;
+        }
+
+        if (commandSearch) {
+            window.location.href = commandSearch.target;
+            return;
+        }
+
+        void searchWithDefaultProvider(value).catch(() => {
+            document.body.classList.remove('departing');
+        });
     }, 400);
 
     return true;
@@ -382,14 +366,21 @@ inputElement.addEventListener('input', () => {
 inputElement.addEventListener('keydown', event => {
     const value = inputElement.value;
 
-    if (event.key === 'Enter' && event.shiftKey) {
+    if (event.key === 'Enter') {
         event.preventDefault();
-        if (navigateFromInput(true)) triggerRecoil();
+        if (navigateFromInput(event.shiftKey)) triggerRecoil();
         return;
     }
 
     if (event.key === ' ' && value.startsWith('/') && !value.includes(' ')) {
         const command = value.slice(1).toLowerCase();
+        const result = resolveCommand(command, searchEngines);
+
+        if (result.type === 'engine') {
+            previewSearchEngine(result.key);
+            return;
+        }
+
         if (executeCommand(command)) {
             event.preventDefault();
             triggerRecoil();
@@ -459,13 +450,6 @@ document.addEventListener('click', event => {
 applyI18n();
 renderHelp();
 renderSettings();
-
-const savedEngine = safeGetItem(localStorage, STORAGE_KEYS.engine);
-if (searchEngines[savedEngine]) {
-    setSearchEngine(savedEngine, false, false);
-} else {
-    setSearchEngine(currentEngineKey, false, false);
-}
 
 const savedTheme = safeGetItem(localStorage, STORAGE_KEYS.theme);
 setTheme(['dark', 'light'].includes(savedTheme) ? savedTheme : DEFAULT_THEME, false);

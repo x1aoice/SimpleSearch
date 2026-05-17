@@ -19,7 +19,7 @@ test('declares a minimal new tab extension manifest', async () => {
         extension_pages: "script-src 'self'; object-src 'self';",
     });
     assert.deepEqual(manifest.chrome_url_overrides, { newtab: 'index.html' });
-    assert.equal(manifest.permissions, undefined);
+    assert.deepEqual(manifest.permissions, ['search']);
     assert.equal(manifest.host_permissions, undefined);
     assert.equal(enMessages.extName.message, 'SimpleSearch');
     assert.equal(zhMessages.extName.message, 'SimpleSearch');

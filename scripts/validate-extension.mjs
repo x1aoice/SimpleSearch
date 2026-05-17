@@ -13,6 +13,7 @@ const runtimeFiles = [
     'src/config.js',
     'src/custom-engines.js',
     'src/i18n.js',
+    'src/search.js',
     'src/storage.js',
     'src/url.js',
     '_locales/en/messages.json',
@@ -29,7 +30,7 @@ assert.deepEqual(manifest.chrome_url_overrides, { newtab: 'index.html' });
 assert.deepEqual(manifest.content_security_policy, {
     extension_pages: "script-src 'self'; object-src 'self';",
 });
-assert.equal(manifest.permissions, undefined);
+assert.deepEqual(manifest.permissions, ['search']);
 assert.equal(manifest.host_permissions, undefined);
 assert.equal(manifest.background, undefined);
 assert.equal(manifest.content_scripts, undefined);

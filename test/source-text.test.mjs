@@ -22,6 +22,9 @@ test('keeps localized UI text wired through readable source files', async () => 
     assert.match(app, /textContent = t\('add'/);
     assert.match(app, /value\.slice\(0, cursorIndex\)/);
     assert.match(app, /style\.setProperty\('--caret-x'/);
+    assert.match(app, /searchWithDefaultProvider\(value\)/);
+    assert.match(app, /getCommandSearch\(value, searchEngines\)/);
+    assert.match(app, /navigateFromInput\(event\.shiftKey\)/);
     assert.match(app, /const hasSelection = inputElement\.selectionStart !== inputElement\.selectionEnd/);
     assert.match(app, /document\.addEventListener\('selectionchange'/);
     assert.match(app, /event\.composedPath\?\.\(\)/);
