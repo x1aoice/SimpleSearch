@@ -260,7 +260,7 @@ form {
 
 .custom-engine-form {
   display: grid;
-  grid-template-columns: minmax(84px, 0.7fr) minmax(132px, 1fr) minmax(320px, 3fr) minmax(104px, 0.8fr) auto;
+  grid-template-columns: minmax(84px, 0.7fr) minmax(132px, 1fr) minmax(300px, 3fr) minmax(104px, 0.8fr) 64px;
   gap: 10px;
   align-items: end;
 }
@@ -278,7 +278,8 @@ form {
   white-space: nowrap;
 }
 
-.custom-engine-form input {
+.custom-engine-form input,
+.custom-engine-row input {
   width: 100%;
   height: var(--control-height);
   border: 1px solid var(--surface-border);
@@ -292,17 +293,20 @@ form {
   padding: 0 10px;
 }
 
-.custom-engine-form input::placeholder {
+.custom-engine-form input::placeholder,
+.custom-engine-row input::placeholder {
   color: var(--ghost);
 }
 
-.custom-engine-form input:focus {
+.custom-engine-form input:focus,
+.custom-engine-row input:focus {
   border-color: var(--text);
-  background: var(--text);
-  color: var(--bg);
+  background: var(--field-bg);
+  color: var(--text);
 }
 
-.custom-engine-form input:focus-visible {
+.custom-engine-form input:focus-visible,
+.custom-engine-row input:focus-visible {
   outline: none;
 }
 
@@ -340,11 +344,11 @@ form {
 
 .custom-engine-row {
   display: grid;
-  grid-template-columns: 8ch 16ch 12ch minmax(0, 1fr) 7ch 4ch;
-  gap: 10px;
+  grid-template-columns: 8ch 16ch minmax(0, 1fr) 12ch 64px 34px;
+  gap: 12px;
   align-items: center;
   min-height: 42px;
-  padding: 0 0 0 12px;
+  padding: 0 12px;
   border: 1px solid transparent;
   border-radius: var(--radius);
   background: var(--field-bg);
@@ -355,6 +359,8 @@ form {
 .custom-engine-row.editing {
   border-color: var(--text);
   color: var(--text);
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .custom-engine-row strong {
@@ -383,6 +389,10 @@ form {
 .delete-engine-button {
   min-width: 34px;
   padding: 0;
+}
+
+.edit-engine-button {
+  min-width: 64px;
 }
 
 .blink {
@@ -447,7 +457,7 @@ form {
   }
 
   .custom-engine-row {
-    grid-template-columns: 76px 112px 86px minmax(0, 1fr) 54px 34px;
+    grid-template-columns: 76px 112px minmax(0, 1fr) 86px 54px 34px;
     gap: 8px;
   }
 }

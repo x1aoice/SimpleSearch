@@ -6,8 +6,8 @@ It can also run as a Chrome/Edge new tab extension.
 
 ## Features
 
-- Default searches use the browser's Chrome default search provider.
-- One-off multi-engine search with slash prefixes.
+- Plain searches use the browser's default search engine through Chrome Search API.
+- Slash commands can run one-off searches with Google, Baidu, Bing, GitHub, DuckDuckGo, or custom engines.
 - Automatic English/Chinese UI based on the browser language.
 - Direct URL, domain, IP, and localhost navigation.
 - `Shift+Enter` to force search when an IP or domain should be searched instead of opened.
@@ -18,21 +18,21 @@ It can also run as a Chrome/Edge new tab extension.
 
 ## Commands
 
-Type a search prefix followed by a query, then press Enter.
+Type a command and press Space to use that engine once, or type a command and search text together.
 
 | Command | Action |
 | --- | --- |
-| `/g cats` | Search Google |
-| `/b cats` | Search Baidu |
-| `/bi cats` | Search Bing |
-| `/gh cats` | Search GitHub |
-| `/dg cats` | Search DuckDuckGo |
+| `/g` | Google |
+| `/b` | Baidu |
+| `/bi` | Bing |
+| `/gh` | GitHub |
+| `/dg` | DuckDuckGo |
 | `/dark` | Dark theme |
 | `/light` | Light theme |
 | `/help` | Open help |
 | `/add` | Add custom search engines |
 
-Utility commands run when you type the command and press Space. Slash text is still searchable: `/b` + Enter searches `/b`, while `/b cats` searches Baidu for `cats`.
+Slash text is still searchable. For example, `/b` + Enter searches `/b`; only `/b` + Space runs the command. Commands do not change or save the browser's default search engine.
 
 ## Custom Search Engines
 
@@ -50,11 +50,11 @@ Then use it like:
 /mdn array map
 ```
 
-Use the edit button in settings to update a custom engine's name, URL, or flash color. Delete removes it from the local configuration.
+You can also type `/mdn`, press Space, then enter the search text. Use the edit button in settings to update a custom engine's name, URL, or flash color. Delete removes it from the local configuration.
 
 ## Browser Extension
 
-SimpleSearch ships as a Manifest V3 new tab extension. It requests the `search` permission so normal searches can use Chrome's default search provider through the Chrome Search API.
+SimpleSearch ships as a Manifest V3 new tab extension with the `search` permission so normal searches can use the browser's configured default search engine.
 The extension uses Chrome's built-in `_locales` system, so Chrome/Edge will choose English or Simplified Chinese automatically from the browser language.
 
 To load it in Chrome or Edge:

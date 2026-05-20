@@ -12,6 +12,8 @@ const RESERVED_COMMANDS = new Set([
 export const CUSTOM_ENGINE_TEMPLATE_MAX_LENGTH = 2048;
 export const DEFAULT_CUSTOM_ENGINE_COLOR = '#111111';
 const TEMPLATE_PROTOCOL_PATTERN = /^([a-z][a-z0-9+.-]*):\/\//i;
+const TEMPLATE_TOKEN_PATTERN = /%s/i;
+const TEMPLATE_TOKEN_GLOBAL_PATTERN = /%s/gi;
 const COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 
 export function loadCustomEngines(storage = window.localStorage) {
@@ -43,7 +45,7 @@ export function toEngineMap(customEngines) {
 }
 
 export function validateCustomEngine(input, existingEngines = [], editingKey = '') {
-    const key = input.key.trim().toLowerCase();
+    const key = normalizeKey(input.key);
     const label = input.label.trim();
     const rawTemplate = input.template.trim();
     const template = normalizeTemplate(rawTemplate);
@@ -70,7 +72,7 @@ export function validateCustomEngine(input, existingEngines = [], editingKey = '
         return validationError('customEngineUrlTooLong', [String(CUSTOM_ENGINE_TEMPLATE_MAX_LENGTH)]);
     }
     if (!isHttpTemplate(template)) return validationError('customEngineUrlProtocolInvalid');
-    if (!template.includes('%s')) return validationError('customEngineUrlTokenRequired');
+    if (!TEMPLATE_TOKEN_PATTERN.test(template)) return validationError('customEngineUrlTokenRequired');
     if (!isValidTemplateURL(template)) return validationError('customEngineUrlInvalid');
     if (!isValidColor(color)) return validationError('customEngineColorInvalid');
 
@@ -90,8 +92,13 @@ function validationError(messageKey, substitutions = []) {
 }
 
 function normalizeTemplate(template) {
-    if (!template || TEMPLATE_PROTOCOL_PATTERN.test(template)) return template;
-    return `https://${template}`;
+    const normalizedTemplate = !template || TEMPLATE_PROTOCOL_PATTERN.test(template) ? template : `https://${template}`;
+    return normalizedTemplate.replace(TEMPLATE_TOKEN_GLOBAL_PATTERN, '%s');
+}
+
+function normalizeKey(value) {
+    const key = String(value ?? '').trim().toLowerCase();
+    return key.startsWith('/') ? key.slice(1) : key;
 }
 
 function isHttpTemplate(template) {
@@ -100,7 +107,7 @@ function isHttpTemplate(template) {
 
 function isValidTemplateURL(template) {
     try {
-        new URL(template.replaceAll('%s', 'test'));
+        new URL(template.replace(TEMPLATE_TOKEN_GLOBAL_PATTERN, 'test'));
         return true;
     } catch {
         return false;

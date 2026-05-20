@@ -45,6 +45,39 @@ test('adds https to a custom engine URL without a protocol', () => {
     assert.equal(result.engine.template, 'https://developer.mozilla.org/search?q=%s');
 });
 
+test('accepts uppercase custom engine URL tokens', () => {
+    const result = validateCustomEngine({
+        key: 'docs',
+        label: 'Docs',
+        template: 'search.example.com?q=%S',
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.engine.template, 'https://search.example.com?q=%s');
+});
+
+test('normalizes custom engine commands', () => {
+    const result = validateCustomEngine({
+        key: ' /MDN ',
+        label: 'MDN',
+        template: 'developer.mozilla.org/search?q=%s',
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.engine.key, 'mdn');
+});
+
+test('allows a 16 character command when typed with a slash', () => {
+    const result = validateCustomEngine({
+        key: '/abcdefghijklmnop',
+        label: 'Long Command',
+        template: 'https://example.com/search?q=%s',
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.engine.key, 'abcdefghijklmnop');
+});
+
 test('validates a custom search engine color', () => {
     const result = validateCustomEngine({
         key: 'docs',
@@ -106,6 +139,11 @@ test('rejects reserved, duplicate, and invalid engines', () => {
         template: 'https://example.com/search?q=%s',
         color: 'red',
     }).ok, false);
+    assert.equal(validateCustomEngine({
+        key: '/',
+        label: 'Slash',
+        template: 'https://example.com?q=%s',
+    }).ok, false);
 });
 
 test('allows editing the same custom engine command', () => {
@@ -132,6 +170,8 @@ test('rejects editing a custom engine into another custom command', () => {
 test('loads and maps valid custom engines from storage', () => {
     const storage = createStorage(JSON.stringify([
         { key: 'mdn', label: 'MDN', template: 'https://developer.mozilla.org/search?q=%s', color: '#ff8800' },
+        { key: '/MDN', label: 'Duplicate MDN', template: 'https://example.com/search?q=%s' },
+        { key: 'bad', label: 'Bad', template: 'javascript://example.com/%s' },
     ]));
     const engines = loadCustomEngines(storage);
     const engineMap = toEngineMap(engines);

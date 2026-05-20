@@ -1,28 +1,58 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { searchWithDefaultProvider } from '../src/search.js';
+import { getDefaultSearchFallback, searchWithChromeDefault } from '../src/search.js';
 
-test('uses Chrome Search API for default searches', async () => {
+test('runs Chrome default search through the Search API', async () => {
+    const previousChrome = globalThis.chrome;
     const calls = [];
-    const chromeApi = {
+
+    globalThis.chrome = {
         search: {
-            query(info) {
-                calls.push(info);
+            query(options) {
+                calls.push(options);
             },
         },
     };
-    const locationObject = { href: '' };
 
-    await searchWithDefaultProvider('hello world', chromeApi, locationObject);
-
-    assert.deepEqual(calls, [{ text: 'hello world', disposition: 'CURRENT_TAB' }]);
-    assert.equal(locationObject.href, '');
+    try {
+        assert.equal(await searchWithChromeDefault('array map'), true);
+        assert.deepEqual(calls, [{ text: 'array map', disposition: 'CURRENT_TAB' }]);
+    } finally {
+        globalThis.chrome = previousChrome;
+    }
 });
 
-test('falls back to Google only outside Chrome extension search API', async () => {
-    const locationObject = { href: '' };
+test('reports when Chrome Search API is unavailable', async () => {
+    const previousChrome = globalThis.chrome;
+    globalThis.chrome = undefined;
 
-    await searchWithDefaultProvider('hello world', {}, locationObject);
+    try {
+        assert.equal(await searchWithChromeDefault('array map'), false);
+    } finally {
+        globalThis.chrome = previousChrome;
+    }
+});
 
-    assert.equal(locationObject.href, 'https://www.google.com/search?q=hello%20world');
+test('reports Chrome Search API failures', async () => {
+    const previousChrome = globalThis.chrome;
+    globalThis.chrome = {
+        search: {
+            async query() {
+                throw new Error('search unavailable');
+            },
+        },
+    };
+
+    try {
+        assert.equal(await searchWithChromeDefault('array map'), false);
+    } finally {
+        globalThis.chrome = previousChrome;
+    }
+});
+
+test('keeps a browser-safe fallback for local development', () => {
+    assert.equal(
+        getDefaultSearchFallback('array map'),
+        'https://www.google.com/search?q=array%20map',
+    );
 });

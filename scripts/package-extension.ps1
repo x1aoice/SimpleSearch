@@ -63,3 +63,4 @@ foreach ($RelativePath in $RuntimePaths) {
 Compress-Archive -Path (Join-Path $StagePath "*") -DestinationPath $ZipPath -Force
 
 Write-Output "Created $ZipPath"
+Write-Output "Created $StagePath"

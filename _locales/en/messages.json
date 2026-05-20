@@ -6,10 +6,10 @@
     "message": "SimpleSearch"
   },
   "extDescription": {
-    "message": "A minimalist terminal-style search launcher for your new tab page."
+    "message": "A clean, keyboard-first new tab search launcher with a terminal feel."
   },
   "pageDescription": {
-    "message": "A minimalist desktop search launcher with commands and custom search engines."
+    "message": "A clean search launcher with commands and custom search engines."
   },
   "search": {
     "message": "Search"
@@ -107,7 +107,7 @@
     "message": "Force search the current input"
   },
   "customEngineCommandInvalid": {
-    "message": "Command must be 1-16 lowercase letters or numbers."
+    "message": "Command must be 1-16 letters or numbers."
   },
   "customEngineCommandReserved": {
     "message": "This command is already reserved."

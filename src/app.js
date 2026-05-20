@@ -1,6 +1,7 @@
 import {
     CARET_OFFSET,
     COMMAND_HELP,
+    DEFAULT_ENGINE_KEY,
     DEFAULT_THEME,
     SHORTCUT_HELP,
     STORAGE_KEYS,
@@ -13,8 +14,8 @@ import {
     toEngineMap,
     validateCustomEngine,
 } from './custom-engines.js';
-import { searchWithDefaultProvider } from './search.js';
-import { getCommandSearch, getURLTarget } from './url.js';
+import { getSearchTarget, getURLTarget } from './url.js';
+import { getDefaultSearchFallback, searchWithChromeDefault } from './search.js';
 import { safeGetItem, safeRemoveItem, safeSetItem } from './storage.js';
 import { applyI18n, t } from './i18n.js';
 
@@ -41,6 +42,7 @@ const customEngineListElement = document.getElementById('custom-engine-list');
 
 let customEngines = loadCustomEngines();
 let searchEngines = toEngineMap(customEngines);
+let oneShotEngineKey = '';
 let editingCustomEngineKey = '';
 let blinkTimer = null;
 
@@ -102,7 +104,7 @@ function renderHelp() {
     renderDefinitionList(
         engineHelpElement,
         Object.entries(searchEngines).map(([key, engine]) => ({
-            keys: `/${key} ...`,
+            keys: `/${key}`,
             description: engine.label,
         })),
     );
@@ -112,6 +114,78 @@ function renderHelp() {
 
 function renderSettings() {
     renderCustomEngines();
+}
+
+function createCustomEngineInput(field, value, maxLength, label) {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = value;
+    input.maxLength = maxLength;
+    input.spellcheck = false;
+    input.autocomplete = 'off';
+    input.dataset.engineField = field;
+    input.setAttribute('aria-label', label);
+    return input;
+}
+
+function createCustomEngineDisplayRow(engine) {
+    const row = document.createElement('div');
+    const key = document.createElement('strong');
+    const label = document.createElement('span');
+    const template = document.createElement('span');
+    const color = document.createElement('span');
+    const editButton = document.createElement('button');
+    const deleteButton = document.createElement('button');
+
+    row.className = 'custom-engine-row';
+    key.textContent = `/${engine.key}`;
+    label.textContent = engine.label;
+    template.textContent = engine.template;
+    template.title = engine.template;
+    color.className = 'custom-engine-color-code';
+    color.textContent = engine.color;
+    color.title = engine.color;
+    editButton.className = 'choice-button edit-engine-button';
+    editButton.type = 'button';
+    editButton.dataset.editEngine = engine.key;
+    editButton.ariaLabel = t('editEngine', [engine.label]);
+    editButton.textContent = t('edit');
+    deleteButton.className = 'choice-button delete-engine-button';
+    deleteButton.type = 'button';
+    deleteButton.dataset.deleteEngine = engine.key;
+    deleteButton.ariaLabel = t('deleteEngine', [engine.label]);
+    deleteButton.textContent = '\u00d7';
+
+    row.append(key, label, template, color, editButton, deleteButton);
+    return row;
+}
+
+function createCustomEngineEditRow(engine) {
+    const row = document.createElement('div');
+    const saveButton = document.createElement('button');
+    const cancelButton = document.createElement('button');
+
+    row.className = 'custom-engine-row editing';
+    row.dataset.editingEngine = engine.key;
+    saveButton.className = 'choice-button edit-engine-button';
+    saveButton.type = 'button';
+    saveButton.dataset.saveEngine = engine.key;
+    saveButton.textContent = t('save');
+    cancelButton.className = 'choice-button delete-engine-button';
+    cancelButton.type = 'button';
+    cancelButton.dataset.cancelEngineEdit = engine.key;
+    cancelButton.ariaLabel = t('cancelEdit');
+    cancelButton.textContent = '\u00d7';
+
+    row.append(
+        createCustomEngineInput('key', engine.key, 17, t('command')),
+        createCustomEngineInput('label', engine.label, 32, t('name')),
+        createCustomEngineInput('template', engine.template, 2048, t('urlTemplateLabel')),
+        createCustomEngineInput('color', engine.color, 7, t('color')),
+        saveButton,
+        cancelButton,
+    );
+    return row;
 }
 
 function renderCustomEngines() {
@@ -124,38 +198,11 @@ function renderCustomEngines() {
     }
 
     customEngineListElement.replaceChildren(
-        ...customEngines.map(engine => {
-            const row = document.createElement('div');
-            const key = document.createElement('strong');
-            const label = document.createElement('span');
-            const color = document.createElement('span');
-            const template = document.createElement('span');
-            const editButton = document.createElement('button');
-            const deleteButton = document.createElement('button');
-
-            row.className = 'custom-engine-row';
-            row.classList.toggle('editing', engine.key === editingCustomEngineKey);
-            key.textContent = `/${engine.key}`;
-            label.textContent = engine.label;
-            color.className = 'custom-engine-color-code';
-            color.textContent = engine.color;
-            color.title = engine.color;
-            template.textContent = engine.template;
-            template.title = engine.template;
-            editButton.className = 'choice-button edit-engine-button';
-            editButton.type = 'button';
-            editButton.dataset.editEngine = engine.key;
-            editButton.ariaLabel = t('editEngine', [engine.label]);
-            editButton.textContent = t('edit');
-            deleteButton.className = 'choice-button delete-engine-button';
-            deleteButton.type = 'button';
-            deleteButton.dataset.deleteEngine = engine.key;
-            deleteButton.ariaLabel = t('deleteEngine', [engine.label]);
-            deleteButton.textContent = '×';
-
-            row.append(key, label, color, template, editButton, deleteButton);
-            return row;
-        }),
+        ...customEngines.map(engine => (
+            engine.key === editingCustomEngineKey
+                ? createCustomEngineEditRow(engine)
+                : createCustomEngineDisplayRow(engine)
+        )),
     );
 }
 
@@ -183,11 +230,19 @@ function showSettings() {
     settingsPanel.hidden = false;
 }
 
-function previewSearchEngine(key) {
-    const engine = searchEngines[key];
-    if (!engine) return;
+function clearArmedEngine() {
+    oneShotEngineKey = '';
+    inputElement.setAttribute('aria-label', t('search'));
+    document.body.style.setProperty('--flash-color', searchEngines[DEFAULT_ENGINE_KEY].color);
+}
 
+function flashEngine(engine, animate = true) {
     document.body.style.setProperty('--flash-color', engine.color);
+    inputElement.setAttribute('aria-label', t('searchWithEngine', [engine.label]));
+    resetInputState();
+
+    if (!animate) return;
+
     updateUI();
 
     caretElement.classList.remove('blink', 'flash-brand');
@@ -198,6 +253,14 @@ function previewSearchEngine(key) {
         caretElement.classList.remove('flash-brand');
         caretElement.classList.add('blink');
     }, 500);
+}
+
+function armSearchEngine(key, animate = true) {
+    const engine = searchEngines[key];
+    if (!engine) return;
+
+    oneShotEngineKey = key;
+    flashEngine(engine, animate);
 }
 
 function setTheme(theme, savePreference = true) {
@@ -232,6 +295,9 @@ function triggerRecoil() {
 function refreshCustomEngines(nextEngines) {
     customEngines = nextEngines;
     searchEngines = toEngineMap(customEngines);
+    if (oneShotEngineKey && !searchEngines[oneShotEngineKey]) {
+        clearArmedEngine();
+    }
     saveCustomEngines(customEngines);
     renderHelp();
     renderSettings();
@@ -240,19 +306,27 @@ function refreshCustomEngines(nextEngines) {
 function executeCommand(command) {
     const result = resolveCommand(command, searchEngines);
 
+    if (result.type === 'engine') {
+        armSearchEngine(result.key);
+        return true;
+    }
+
     if (result.type === 'theme') {
+        clearArmedEngine();
         setTheme(result.theme);
         resetInputState();
         return true;
     }
 
     if (result.type === 'help') {
+        clearArmedEngine();
         resetInputState();
         showHelp();
         return true;
     }
 
     if (result.type === 'settings') {
+        clearArmedEngine();
         resetInputState();
         showSettings();
         return true;
@@ -274,60 +348,117 @@ function resetCustomEngineForm() {
     renderCustomEngines();
 }
 
+function getCustomEngineFormInput() {
+    return {
+        key: customEngineKeyInput.value,
+        label: customEngineLabelInput.value,
+        template: customEngineTemplateInput.value,
+        color: customEngineColorInput.value,
+    };
+}
+
+function getCustomEngineRowInput(row) {
+    return {
+        key: row.querySelector('[data-engine-field="key"]').value,
+        label: row.querySelector('[data-engine-field="label"]').value,
+        template: row.querySelector('[data-engine-field="template"]').value,
+        color: row.querySelector('[data-engine-field="color"]').value,
+    };
+}
+
+function focusEditingCustomEngine() {
+    requestAnimationFrame(() => {
+        const row = [...customEngineListElement.querySelectorAll('[data-editing-engine]')]
+            .find(item => item.dataset.editingEngine === editingCustomEngineKey);
+        row?.querySelector('[data-engine-field="key"]')?.focus();
+    });
+}
+
 function editCustomEngine(key) {
     const engine = customEngines.find(item => item.key === key);
     if (!engine) return;
 
     editingCustomEngineKey = key;
-    customEngineKeyInput.value = engine.key;
-    customEngineLabelInput.value = engine.label;
-    customEngineTemplateInput.value = engine.template;
-    customEngineColorInput.value = engine.color;
-    customEngineForm.classList.add('editing');
-    customEngineSubmitButton.textContent = t('save');
-    customEngineCancelButton.hidden = false;
-    customEngineStateElement.textContent = t('editingEngine', [engine.key]);
+    customEngineStateElement.textContent = '';
     customEngineErrorElement.textContent = '';
     renderCustomEngines();
-    customEngineKeyInput.focus();
+    focusEditingCustomEngine();
 }
 
-function saveCustomEngine() {
-    const result = validateCustomEngine(
-        {
-            key: customEngineKeyInput.value,
-            label: customEngineLabelInput.value,
-            template: customEngineTemplateInput.value,
-            color: customEngineColorInput.value,
-        },
-        customEngines,
-        editingCustomEngineKey,
-    );
+function commitCustomEngine(input, editingKey = '') {
+    const result = validateCustomEngine(input, customEngines, editingKey);
 
     if (!result.ok) {
         customEngineErrorElement.textContent = t(result.messageKey, result.substitutions);
-        return;
+        return false;
     }
 
-    const nextEngines = editingCustomEngineKey
-        ? customEngines.map(engine => (engine.key === editingCustomEngineKey ? result.engine : engine))
+    const editedEngineKey = editingKey;
+    const shouldRefreshArmedEngine = editedEngineKey && oneShotEngineKey === editedEngineKey;
+    const nextEngines = editedEngineKey
+        ? customEngines.map(engine => (engine.key === editedEngineKey ? result.engine : engine))
         : [...customEngines, result.engine];
 
+    editingCustomEngineKey = '';
+    customEngineStateElement.textContent = '';
     customEngineErrorElement.textContent = '';
     refreshCustomEngines(nextEngines);
+    if (shouldRefreshArmedEngine) {
+        armSearchEngine(result.engine.key, false);
+    }
+
+    return true;
+}
+
+function saveCustomEngine() {
+    if (!commitCustomEngine(getCustomEngineFormInput())) return;
+
     resetCustomEngineForm();
+    customEngineKeyInput.focus();
+}
+
+function saveInlineCustomEngine(key, row) {
+    if (!row || !commitCustomEngine(getCustomEngineRowInput(row), key)) return;
+
     customEngineKeyInput.focus();
 }
 
 function deleteCustomEngine(key) {
     const nextEngines = customEngines.filter(engine => engine.key !== key);
 
-    if (editingCustomEngineKey === key) {
-        resetCustomEngineForm();
+    if (oneShotEngineKey === key) {
+        clearArmedEngine();
     }
 
+    if (editingCustomEngineKey === key) editingCustomEngineKey = '';
+
+    customEngineStateElement.textContent = '';
     customEngineErrorElement.textContent = '';
     refreshCustomEngines(nextEngines);
+}
+
+function parseInlineEngineSearch(value) {
+    const match = value.match(/^\/([a-z0-9]{1,16})\s+(.+)$/i);
+    if (!match) return null;
+
+    const key = match[1].toLowerCase();
+    const engine = searchEngines[key];
+    const text = match[2].trim();
+
+    if (!engine || !text) return null;
+
+    return { engine, text };
+}
+
+async function navigateToSearch(text, engine = null) {
+    if (engine) {
+        window.location.href = getSearchTarget(engine, text);
+        return;
+    }
+
+    if (!(await searchWithChromeDefault(text))) {
+        window.location.href = getDefaultSearchFallback(text);
+    }
 }
 
 function navigateFromInput(forceSearch = false) {
@@ -335,25 +466,21 @@ function navigateFromInput(forceSearch = false) {
 
     if (!value) return false;
 
+    const inlineEngineSearch = parseInlineEngineSearch(value);
+    const searchText = inlineEngineSearch?.text || value;
+    const selectedEngine = inlineEngineSearch?.engine || searchEngines[oneShotEngineKey] || null;
+
     document.body.classList.add('departing');
 
     setTimeout(() => {
-        const urlTarget = forceSearch ? null : getURLTarget(value);
-        const commandSearch = forceSearch ? null : getCommandSearch(value, searchEngines);
+        const urlTarget = forceSearch || inlineEngineSearch ? null : getURLTarget(value);
 
         if (urlTarget) {
             window.location.href = urlTarget;
             return;
         }
 
-        if (commandSearch) {
-            window.location.href = commandSearch.target;
-            return;
-        }
-
-        void searchWithDefaultProvider(value).catch(() => {
-            document.body.classList.remove('departing');
-        });
+        navigateToSearch(searchText, selectedEngine);
     }, 400);
 
     return true;
@@ -374,13 +501,6 @@ inputElement.addEventListener('keydown', event => {
 
     if (event.key === ' ' && value.startsWith('/') && !value.includes(' ')) {
         const command = value.slice(1).toLowerCase();
-        const result = resolveCommand(command, searchEngines);
-
-        if (result.type === 'engine') {
-            previewSearchEngine(result.key);
-            return;
-        }
-
         if (executeCommand(command)) {
             event.preventDefault();
             triggerRecoil();
@@ -395,6 +515,7 @@ inputElement.addEventListener('keydown', event => {
         }
 
         inputElement.value = '';
+        clearArmedEngine();
         updateUI();
         return;
     }
@@ -430,6 +551,18 @@ customEngineCancelButton.addEventListener('click', () => {
     customEngineKeyInput.focus();
 });
 customEngineListElement.addEventListener('click', event => {
+    const saveButton = event.target.closest('[data-save-engine]');
+    if (saveButton) {
+        saveInlineCustomEngine(saveButton.dataset.saveEngine, saveButton.closest('.custom-engine-row'));
+        return;
+    }
+
+    const cancelButton = event.target.closest('[data-cancel-engine-edit]');
+    if (cancelButton) {
+        resetCustomEngineForm();
+        return;
+    }
+
     const editButton = event.target.closest('[data-edit-engine]');
     if (editButton) {
         editCustomEngine(editButton.dataset.editEngine);
@@ -441,6 +574,19 @@ customEngineListElement.addEventListener('click', event => {
     deleteCustomEngine(button.dataset.deleteEngine);
 });
 
+customEngineListElement.addEventListener('keydown', event => {
+    if (!event.target.matches('[data-engine-field]')) return;
+
+    const row = event.target.closest('.custom-engine-row');
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        saveInlineCustomEngine(row?.dataset.editingEngine, row);
+    } else if (event.key === 'Escape') {
+        event.preventDefault();
+        resetCustomEngineForm();
+    }
+});
+
 document.addEventListener('click', event => {
     if (isPanelInteraction(event)) return;
     if (!helpPanel.hidden || !settingsPanel.hidden) hidePanels();
@@ -450,6 +596,7 @@ document.addEventListener('click', event => {
 applyI18n();
 renderHelp();
 renderSettings();
+clearArmedEngine();
 
 const savedTheme = safeGetItem(localStorage, STORAGE_KEYS.theme);
 setTheme(['dark', 'light'].includes(savedTheme) ? savedTheme : DEFAULT_THEME, false);

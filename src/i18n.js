@@ -1,7 +1,7 @@
 const FALLBACK_MESSAGES = {
     en: {
-        extDescription: 'A minimalist terminal-style search launcher for your new tab page.',
-        pageDescription: 'A minimalist desktop search launcher with commands and custom search engines.',
+        extDescription: 'A clean, keyboard-first new tab search launcher with a terminal feel.',
+        pageDescription: 'A clean search launcher with commands and custom search engines.',
         search: 'Search',
         searchWithEngine: 'Search $1',
         help: 'Help',
@@ -27,7 +27,7 @@ const FALLBACK_MESSAGES = {
         commandDarkTheme: 'Dark theme',
         commandLightTheme: 'Light theme',
         shortcutForceSearch: 'Force search the current input',
-        customEngineCommandInvalid: 'Command must be 1-16 lowercase letters or numbers.',
+        customEngineCommandInvalid: 'Command must be 1-16 letters or numbers.',
         customEngineCommandReserved: 'This command is already reserved.',
         customEngineCommandDuplicate: 'This command already exists.',
         customEngineNameInvalid: 'Name must be 1-32 characters.',
@@ -39,8 +39,8 @@ const FALLBACK_MESSAGES = {
         customEngineColorInvalid: 'Color format is invalid.',
     },
     'zh-CN': {
-        extDescription: '极简终端风格的新标签页搜索启动器。',
-        pageDescription: '带命令和自定义搜索引擎的极简桌面搜索启动器。',
+        extDescription: '终端风格的极简新标签页搜索启动器。',
+        pageDescription: '支持命令与自定义搜索引擎的极简搜索启动器。',
         search: '搜索',
         searchWithEngine: '搜索 $1',
         help: '帮助',
@@ -66,7 +66,7 @@ const FALLBACK_MESSAGES = {
         commandDarkTheme: '深色主题',
         commandLightTheme: '浅色主题',
         shortcutForceSearch: '强制搜索当前输入',
-        customEngineCommandInvalid: '命令只能使用 1-16 个小写字母或数字。',
+        customEngineCommandInvalid: '命令只能使用 1-16 个字母或数字。',
         customEngineCommandReserved: '这个命令已被占用。',
         customEngineCommandDuplicate: '这个命令已存在。',
         customEngineNameInvalid: '名称需要 1-32 个字符。',

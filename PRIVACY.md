@@ -17,11 +17,11 @@ This data is not sent to SimpleSearch or any SimpleSearch server.
 
 ## Search Queries
 
-Normal searches use Chrome's Search API, so the query is handled by the default search provider selected by the user in Chrome. When the user explicitly uses a slash search prefix or a custom search engine, the query is sent directly to that selected site as part of normal browser navigation.
+When the user submits a normal search, SimpleSearch asks Chrome to search with the browser's configured default search engine. When the user explicitly uses a slash command or custom search engine, the browser navigates to that selected site or URL template.
 
 ## Permissions
 
-SimpleSearch requests the `search` permission to use Chrome's default search provider for normal searches. It does not request host permissions.
+SimpleSearch requests the Chrome `search` permission only to submit normal searches through Chrome's Search API. It does not request host permissions.
 
 ## Remote Code
 

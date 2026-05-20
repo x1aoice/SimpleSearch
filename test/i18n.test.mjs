@@ -32,6 +32,24 @@ test('uses extension i18n messages when Chrome provides them', () => {
     }
 });
 
+test('uses readable Chinese fallback messages', () => {
+    const previousChrome = globalThis.chrome;
+    globalThis.chrome = {
+        i18n: {
+            getUILanguage: () => 'zh-CN',
+            getMessage: () => '',
+        },
+    };
+
+    try {
+        assert.equal(t('search'), '搜索');
+        assert.equal(t('editingEngine', ['docs']), '正在编辑 /docs');
+        assert.equal(t('customEngineCommandInvalid'), '命令只能使用 1-16 个字母或数字。');
+    } finally {
+        globalThis.chrome = previousChrome;
+    }
+});
+
 test('defines every UI translation key in English and Chinese', async () => {
     const [html, app, customEngines, enMessages, zhMessages] = await Promise.all([
         readFile(new URL('../index.html', import.meta.url), 'utf8'),
