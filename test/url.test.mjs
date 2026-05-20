@@ -9,6 +9,7 @@ test('detects regular web targets', () => {
     assert.equal(getURLTarget('example.com?x=1'), 'https://example.com?x=1');
     assert.equal(getURLTarget('example.com#top'), 'https://example.com#top');
     assert.equal(getURLTarget('https://example.com/path'), 'https://example.com/path');
+    assert.equal(getURLTarget('https://user:pass@example.com/path'), 'https://user:pass@example.com/path');
 });
 
 test('uses http for local targets', () => {
@@ -27,6 +28,7 @@ test('rejects invalid or unsafe URL-like input', () => {
     assert.equal(isValidURL('-bad.com'), false);
     assert.equal(isValidURL('bad-.com'), false);
     assert.equal(getURLTarget('hello world'), null);
+    assert.equal(getURLTarget('user@example.com'), null);
 });
 
 test('builds search URLs from the selected engine', () => {

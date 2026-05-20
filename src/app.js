@@ -34,9 +34,7 @@ const customEngineKeyInput = document.getElementById('custom-engine-key');
 const customEngineLabelInput = document.getElementById('custom-engine-label');
 const customEngineTemplateInput = document.getElementById('custom-engine-template');
 const customEngineColorInput = document.getElementById('custom-engine-color');
-const customEngineSubmitButton = document.getElementById('custom-engine-submit');
-const customEngineCancelButton = document.getElementById('custom-engine-cancel');
-const customEngineStateElement = document.getElementById('custom-engine-state');
+const colorPreviewElement = document.getElementById('color-preview');
 const customEngineErrorElement = document.getElementById('custom-engine-error');
 const customEngineListElement = document.getElementById('custom-engine-list');
 
@@ -45,6 +43,28 @@ let searchEngines = toEngineMap(customEngines);
 let oneShotEngineKey = '';
 let editingCustomEngineKey = '';
 let blinkTimer = null;
+let flashTimer = null;
+let recoilTimer = null;
+let navigationTimer = null;
+let updateFrame = 0;
+const errorShakeTimers = new WeakMap();
+
+function triggerErrorShake(element) {
+    if (!element) return;
+
+    const existingTimer = errorShakeTimers.get(element);
+    if (existingTimer) clearTimeout(existingTimer);
+
+    element.classList.remove('error-shake');
+    void element.offsetWidth;
+    element.classList.add('error-shake');
+
+    const timer = setTimeout(() => {
+        element.classList.remove('error-shake');
+        errorShakeTimers.delete(element);
+    }, 260);
+    errorShakeTimers.set(element, timer);
+}
 
 function syncMeasureStyles() {
     const computedStyle = window.getComputedStyle(inputElement);
@@ -55,6 +75,11 @@ function syncMeasureStyles() {
 }
 
 function updateUI() {
+    if (updateFrame) {
+        cancelAnimationFrame(updateFrame);
+        updateFrame = 0;
+    }
+
     const value = inputElement.value;
     const cursorIndex = inputElement.selectionStart ?? value.length;
     const hasSelection = inputElement.selectionStart !== inputElement.selectionEnd;
@@ -79,7 +104,17 @@ function updateUI() {
     clearTimeout(blinkTimer);
     blinkTimer = setTimeout(() => {
         caretElement.classList.add('blink');
+        blinkTimer = null;
     }, 500);
+}
+
+function scheduleUpdateUI() {
+    if (updateFrame) return;
+
+    updateFrame = requestAnimationFrame(() => {
+        updateFrame = 0;
+        updateUI();
+    });
 }
 
 function resetInputState() {
@@ -209,6 +244,7 @@ function renderCustomEngines() {
 function hidePanels() {
     helpPanel.hidden = true;
     settingsPanel.hidden = true;
+    document.body.classList.remove('panel-visible');
 }
 
 function isPanelInteraction(event) {
@@ -223,11 +259,19 @@ function isPanelInteraction(event) {
 function showHelp() {
     hidePanels();
     helpPanel.hidden = false;
+    document.body.classList.add('panel-visible');
+    requestAnimationFrame(() => {
+        if (!helpPanel.hidden) helpPanel.focus();
+    });
 }
 
 function showSettings() {
     hidePanels();
     settingsPanel.hidden = false;
+    document.body.classList.add('panel-visible');
+    requestAnimationFrame(() => {
+        if (!settingsPanel.hidden) customEngineKeyInput.focus();
+    });
 }
 
 function clearArmedEngine() {
@@ -237,9 +281,15 @@ function clearArmedEngine() {
 }
 
 function flashEngine(engine, animate = true) {
+    if (flashTimer) {
+        clearTimeout(flashTimer);
+        flashTimer = null;
+    }
+
     document.body.style.setProperty('--flash-color', engine.color);
     inputElement.setAttribute('aria-label', t('searchWithEngine', [engine.label]));
     resetInputState();
+    caretElement.classList.remove('flash-brand');
 
     if (!animate) return;
 
@@ -249,9 +299,10 @@ function flashEngine(engine, animate = true) {
     void caretElement.offsetWidth;
     caretElement.classList.add('flash-brand');
 
-    setTimeout(() => {
+    flashTimer = setTimeout(() => {
         caretElement.classList.remove('flash-brand');
         caretElement.classList.add('blink');
+        flashTimer = null;
     }, 500);
 }
 
@@ -282,14 +333,22 @@ function setTheme(theme, savePreference = true) {
         }
     }
 
-    setTimeout(updateUI, 50);
+    scheduleUpdateUI();
 }
 
 function triggerRecoil() {
+    if (recoilTimer) {
+        clearTimeout(recoilTimer);
+        recoilTimer = null;
+    }
+
     inputWrapper.classList.remove('recoil');
     void inputWrapper.offsetWidth;
     inputWrapper.classList.add('recoil');
-    setTimeout(() => inputWrapper.classList.remove('recoil'), 50);
+    recoilTimer = setTimeout(() => {
+        inputWrapper.classList.remove('recoil');
+        recoilTimer = null;
+    }, 150);
 }
 
 function refreshCustomEngines(nextEngines) {
@@ -335,15 +394,23 @@ function executeCommand(command) {
     return false;
 }
 
+function updateColorPreview() {
+    const color = customEngineColorInput.value.trim();
+    const isValidColor = /^#[0-9a-f]{6}$/i.test(color);
+
+    colorPreviewElement.classList.toggle('invalid', !isValidColor);
+    if (isValidColor) {
+        colorPreviewElement.style.backgroundColor = color;
+    } else {
+        colorPreviewElement.style.backgroundColor = 'transparent';
+    }
+}
+
 function resetCustomEngineForm() {
     editingCustomEngineKey = '';
     customEngineForm.reset();
     customEngineColorInput.value = DEFAULT_CUSTOM_ENGINE_COLOR;
-    customEngineForm.classList.remove('editing');
-    customEngineKeyInput.disabled = false;
-    customEngineSubmitButton.textContent = t('add');
-    customEngineCancelButton.hidden = true;
-    customEngineStateElement.textContent = '';
+    updateColorPreview();
     customEngineErrorElement.textContent = '';
     renderCustomEngines();
 }
@@ -379,17 +446,17 @@ function editCustomEngine(key) {
     if (!engine) return;
 
     editingCustomEngineKey = key;
-    customEngineStateElement.textContent = '';
     customEngineErrorElement.textContent = '';
     renderCustomEngines();
     focusEditingCustomEngine();
 }
 
-function commitCustomEngine(input, editingKey = '') {
+function commitCustomEngine(input, editingKey = '', feedbackElement = customEngineForm) {
     const result = validateCustomEngine(input, customEngines, editingKey);
 
     if (!result.ok) {
         customEngineErrorElement.textContent = t(result.messageKey, result.substitutions);
+        triggerErrorShake(feedbackElement);
         return false;
     }
 
@@ -400,7 +467,6 @@ function commitCustomEngine(input, editingKey = '') {
         : [...customEngines, result.engine];
 
     editingCustomEngineKey = '';
-    customEngineStateElement.textContent = '';
     customEngineErrorElement.textContent = '';
     refreshCustomEngines(nextEngines);
     if (shouldRefreshArmedEngine) {
@@ -418,7 +484,7 @@ function saveCustomEngine() {
 }
 
 function saveInlineCustomEngine(key, row) {
-    if (!row || !commitCustomEngine(getCustomEngineRowInput(row), key)) return;
+    if (!row || !commitCustomEngine(getCustomEngineRowInput(row), key, row)) return;
 
     customEngineKeyInput.focus();
 }
@@ -432,7 +498,6 @@ function deleteCustomEngine(key) {
 
     if (editingCustomEngineKey === key) editingCustomEngineKey = '';
 
-    customEngineStateElement.textContent = '';
     customEngineErrorElement.textContent = '';
     refreshCustomEngines(nextEngines);
 }
@@ -462,9 +527,14 @@ async function navigateToSearch(text, engine = null) {
 }
 
 function navigateFromInput(forceSearch = false) {
+    if (navigationTimer) return false;
+
     const value = inputElement.value.trim();
 
-    if (!value) return false;
+    if (!value) {
+        triggerErrorShake(inputWrapper);
+        return false;
+    }
 
     const inlineEngineSearch = parseInlineEngineSearch(value);
     const searchText = inlineEngineSearch?.text || value;
@@ -472,7 +542,8 @@ function navigateFromInput(forceSearch = false) {
 
     document.body.classList.add('departing');
 
-    setTimeout(() => {
+    navigationTimer = setTimeout(() => {
+        navigationTimer = null;
         const urlTarget = forceSearch || inlineEngineSearch ? null : getURLTarget(value);
 
         if (urlTarget) {
@@ -487,7 +558,14 @@ function navigateFromInput(forceSearch = false) {
 }
 
 inputElement.addEventListener('input', () => {
-    updateUI();
+    scheduleUpdateUI();
+});
+
+inputElement.addEventListener('blur', () => {
+    clearTimeout(blinkTimer);
+    blinkTimer = null;
+    caretElement.classList.remove('blink', 'flash-brand');
+    caretElement.style.opacity = 0;
 });
 
 inputElement.addEventListener('keydown', event => {
@@ -527,6 +605,10 @@ formElement.addEventListener('submit', event => {
 });
 
 window.addEventListener('pageshow', () => {
+    if (navigationTimer) {
+        clearTimeout(navigationTimer);
+        navigationTimer = null;
+    }
     document.body.classList.remove('departing');
     caretElement.classList.add('blink');
     inputElement.focus();
@@ -534,21 +616,17 @@ window.addEventListener('pageshow', () => {
 
 window.addEventListener('resize', () => {
     syncMeasureStyles();
-    updateUI();
+    scheduleUpdateUI();
 });
 
-inputElement.addEventListener('scroll', updateUI);
-inputElement.addEventListener('focus', updateUI);
+inputElement.addEventListener('scroll', scheduleUpdateUI);
+inputElement.addEventListener('focus', scheduleUpdateUI);
 document.addEventListener('selectionchange', () => {
-    if (document.activeElement === inputElement) updateUI();
+    if (document.activeElement === inputElement) scheduleUpdateUI();
 });
 customEngineForm.addEventListener('submit', event => {
     event.preventDefault();
     saveCustomEngine();
-});
-customEngineCancelButton.addEventListener('click', () => {
-    resetCustomEngineForm();
-    customEngineKeyInput.focus();
 });
 customEngineListElement.addEventListener('click', event => {
     const saveButton = event.target.closest('[data-save-engine]');
@@ -587,6 +665,15 @@ customEngineListElement.addEventListener('keydown', event => {
     }
 });
 
+document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return;
+    if (helpPanel.hidden && settingsPanel.hidden) return;
+
+    event.preventDefault();
+    hidePanels();
+    inputElement.focus();
+});
+
 document.addEventListener('click', event => {
     if (isPanelInteraction(event)) return;
     if (!helpPanel.hidden || !settingsPanel.hidden) hidePanels();
@@ -597,13 +684,16 @@ applyI18n();
 renderHelp();
 renderSettings();
 clearArmedEngine();
+updateColorPreview();
+
+customEngineColorInput.addEventListener('input', updateColorPreview);
 
 const savedTheme = safeGetItem(localStorage, STORAGE_KEYS.theme);
 setTheme(['dark', 'light'].includes(savedTheme) ? savedTheme : DEFAULT_THEME, false);
 
 requestAnimationFrame(() => document.body.classList.add('theme-ready'));
 
-setTimeout(() => {
+requestAnimationFrame(() => {
     syncMeasureStyles();
     updateUI();
-}, 10);
+});

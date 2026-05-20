@@ -21,7 +21,7 @@
     </form>
   </main>
 
-  <section id="help-panel" class="panel help-panel" aria-label="Help" data-i18n-aria-label="help" hidden>
+  <section id="help-panel" class="panel help-panel" aria-label="Help" data-i18n-aria-label="help" tabindex="-1" hidden>
     <div class="help-content">
       <div>
         <h2 data-i18n="searchEngines">Search Engines</h2>
@@ -43,7 +43,6 @@
       <section class="settings-group custom-engine-section">
         <div class="settings-group-header">
           <h2 data-i18n="customSearchEngines">Custom Search Engines</h2>
-          <p id="custom-engine-state" class="custom-engine-state" aria-live="polite"></p>
         </div>
         <form id="custom-engine-form" class="custom-engine-form" autocomplete="off">
           <label for="custom-engine-key">
@@ -61,10 +60,10 @@
           <label for="custom-engine-color" class="color-field">
             <span data-i18n="color">Color</span>
             <input id="custom-engine-color" type="text" maxlength="7" spellcheck="false" autocomplete="off" value="#111111" placeholder="#ff8800" aria-label="Flash color" data-i18n-aria-label="flashColor">
+            <span id="color-preview" class="color-preview-dot" aria-hidden="true"></span>
           </label>
           <button id="custom-engine-submit" class="choice-button add-engine-button" type="submit" data-i18n="add">Add</button>
         </form>
-        <button id="custom-engine-cancel" class="choice-button cancel-engine-button" type="button" hidden data-i18n="cancelEdit">Cancel Edit</button>
         <div id="custom-engine-error" class="custom-engine-error" aria-live="polite" role="alert"></div>
         <div id="custom-engine-list" class="custom-engine-list"></div>
       </section>

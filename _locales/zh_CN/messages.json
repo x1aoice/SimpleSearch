@@ -83,14 +83,6 @@
       }
     }
   },
-  "editingEngine": {
-    "message": "正在编辑 /$key$",
-    "placeholders": {
-      "key": {
-        "content": "$1"
-      }
-    }
-  },
   "commandOpenHelp": {
     "message": "打开帮助"
   },

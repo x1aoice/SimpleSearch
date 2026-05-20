@@ -7,9 +7,10 @@
   --radius: 0;
   --flash-color: #1a1a1a;
   --bg: #ffffff;
+  --bg-translucent: rgba(255, 255, 255, 0.85);
   --text: #1a1a1a;
   --muted: #777777;
-  --ghost: #a0a0a0;
+  --ghost: #888888;
   --surface-border: rgba(15, 23, 42, 0.12);
   --field-bg: rgba(15, 23, 42, 0.025);
   --danger: #b42318;
@@ -19,9 +20,10 @@
 
 body.dark {
   --bg: #09090b;
+  --bg-translucent: rgba(9, 9, 11, 0.85);
   --text: #f0f0f0;
   --muted: #a1a1aa;
-  --ghost: #63636b;
+  --ghost: #80808a;
   --surface-border: rgba(255, 255, 255, 0.14);
   --field-bg: rgba(255, 255, 255, 0.035);
   --danger: #ff8a80;
@@ -54,7 +56,7 @@ body.theme-ready {
 body.departing {
   opacity: 0;
   pointer-events: none;
-  transform: scale(0.96);
+  transform: scale(0.985);
 }
 
 .shell {
@@ -80,11 +82,17 @@ form {
   overflow: hidden;
   font-size: var(--font-size);
   transform-origin: center;
-  transition: transform 0.05s ease-out;
+  backface-visibility: hidden;
+  transition: transform 0.18s cubic-bezier(0.2, 0, 0, 1);
+  will-change: transform;
 }
 
 .recoil {
-  transform: scale(0.995);
+  transform: scale(0.98) translateY(2px);
+}
+
+.error-shake {
+  animation: error-shake 0.22s cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 
 .typo {
@@ -129,6 +137,12 @@ form {
   will-change: transform;
 }
 
+body.panel-visible .idle-caret {
+  opacity: 0 !important;
+  animation: none;
+  transition: none;
+}
+
 .measure {
   position: absolute;
   left: 0;
@@ -146,17 +160,23 @@ form {
   width: min(var(--panel-width), calc(100vw - 80px));
   max-height: calc(100dvh - 160px);
   overflow: auto;
-  padding: 24px 28px 26px;
-  border: 1px solid var(--text);
+  padding: 30px 32px 34px;
+  border: 1px solid var(--surface-border);
   border-radius: var(--radius);
-  background: var(--bg);
-  box-shadow: none;
+  background: var(--bg-translucent);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   color: var(--text);
   transform: translateX(-50%);
 }
 
 .panel[hidden] {
   display: none;
+}
+
+.panel:focus {
+  outline: none;
 }
 
 .help-content h2 {
@@ -170,7 +190,7 @@ form {
 .help-content {
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr) minmax(0, 1.1fr);
-  gap: 30px;
+  gap: 40px;
 }
 
 .help-list {
@@ -227,14 +247,6 @@ form {
   margin: 0;
 }
 
-.custom-engine-state {
-  min-height: 18px;
-  margin: 0;
-  color: var(--muted);
-  font-size: 12px;
-  text-align: right;
-}
-
 .choice-button {
   min-width: 74px;
   height: var(--control-height);
@@ -250,7 +262,6 @@ form {
 }
 
 .choice-button:hover,
-.choice-button.active,
 .choice-button:focus-visible {
   border-color: var(--text);
   background: var(--text);
@@ -260,9 +271,10 @@ form {
 
 .custom-engine-form {
   display: grid;
-  grid-template-columns: minmax(84px, 0.7fr) minmax(132px, 1fr) minmax(300px, 3fr) minmax(104px, 0.8fr) 64px;
-  gap: 10px;
+  grid-template-columns: 8ch 16ch minmax(0, 1fr) 96px 64px;
+  gap: 12px;
   align-items: end;
+  font-size: 13px;
 }
 
 .custom-engine-form label {
@@ -278,11 +290,35 @@ form {
   white-space: nowrap;
 }
 
+.color-field {
+  position: relative;
+}
+
+.custom-engine-form .color-field input {
+  padding-right: 32px;
+}
+
+.color-preview-dot {
+  position: absolute;
+  right: 12px;
+  bottom: 14px;
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--surface-border);
+  background: var(--flash-color);
+  pointer-events: none;
+}
+
+.color-preview-dot.invalid {
+  background: transparent;
+  border-style: dashed;
+}
+
 .custom-engine-form input,
 .custom-engine-row input {
   width: 100%;
   height: var(--control-height);
-  border: 1px solid var(--surface-border);
+  border: 1px solid transparent;
   border-radius: var(--radius);
   outline: none;
   background: var(--field-bg);
@@ -290,7 +326,18 @@ form {
   font: inherit;
   font-size: 13px;
   letter-spacing: 0;
-  padding: 0 10px;
+  padding: 0 12px;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.custom-engine-form input:hover,
+.custom-engine-row input:hover {
+  background: rgba(15, 23, 42, 0.05);
+}
+
+body.dark .custom-engine-form input:hover,
+body.dark .custom-engine-row input:hover {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .custom-engine-form input::placeholder,
@@ -301,7 +348,7 @@ form {
 .custom-engine-form input:focus,
 .custom-engine-row input:focus {
   border-color: var(--text);
-  background: var(--field-bg);
+  background: transparent;
   color: var(--text);
 }
 
@@ -312,6 +359,8 @@ form {
 
 .add-engine-button {
   min-width: 0;
+  width: 64px;
+  justify-self: end;
 }
 
 .custom-engine-error {
@@ -328,18 +377,21 @@ form {
 .custom-engine-list {
   display: grid;
   gap: 8px;
-  margin-top: 10px;
+  margin-top: 24px;
+  border-top: 1px solid var(--surface-border);
+  padding-top: 20px;
 }
 
 .custom-engine-empty {
   display: flex;
   align-items: center;
-  min-height: 42px;
-  padding: 0 12px;
+  min-height: 48px;
+  padding: 0 16px;
   border: 1px dashed var(--surface-border);
   border-radius: var(--radius);
   color: var(--muted);
   font-size: 13px;
+  background: var(--field-bg);
 }
 
 .custom-engine-row {
@@ -347,20 +399,39 @@ form {
   grid-template-columns: 8ch 16ch minmax(0, 1fr) 12ch 64px 34px;
   gap: 12px;
   align-items: center;
-  min-height: 42px;
+  min-height: 48px;
   padding: 0 12px;
   border: 1px solid transparent;
   border-radius: var(--radius);
   background: var(--field-bg);
   color: var(--muted);
   font-size: 13px;
+  transition: background-color 0.2s, transform 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s, color 0.2s;
+}
+
+.custom-engine-row:hover:not(.editing) {
+  background: rgba(15, 23, 42, 0.045);
+  color: var(--text);
+}
+
+body.dark .custom-engine-row:hover:not(.editing) {
+  background: rgba(255, 255, 255, 0.045);
 }
 
 .custom-engine-row.editing {
+  animation: edit-row-in 0.16s cubic-bezier(0.2, 0, 0, 1);
   border-color: var(--text);
+  background: transparent;
   color: var(--text);
-  padding-top: 8px;
-  padding-bottom: 8px;
+}
+
+.custom-engine-row.editing input {
+  animation: edit-field-in 0.18s cubic-bezier(0.2, 0, 0, 1);
+  height: 32px;
+}
+
+.custom-engine-row.editing .choice-button {
+  animation: edit-field-in 0.18s cubic-bezier(0.2, 0, 0, 1);
 }
 
 .custom-engine-row strong {
@@ -380,11 +451,6 @@ form {
   font-weight: 700;
 }
 
-.cancel-engine-button {
-  width: fit-content;
-  margin-top: 8px;
-}
-
 .edit-engine-button,
 .delete-engine-button {
   min-width: 34px;
@@ -400,7 +466,7 @@ form {
 }
 
 .flash-brand {
-  animation: flash-color 0.5s ease forwards;
+  animation: flash-color 0.5s cubic-bezier(0.2, 0, 0, 1) forwards;
 }
 
 @keyframes blink {
@@ -420,15 +486,56 @@ form {
     transform: translate(var(--caret-x), -50%) scale(1);
   }
 
-  30% {
+  40% {
     background: var(--flash-color);
-    box-shadow: 0 0 50px var(--flash-color);
-    transform: translate(var(--caret-x), -50%) scale(1.4, 0.8);
+    box-shadow: 0 0 60px var(--flash-color);
+    transform: translate(var(--caret-x), -50%) scale(1.6, 0.7);
   }
 
   100% {
     background: var(--caret-color);
     transform: translate(var(--caret-x), -50%) scale(1);
+  }
+}
+
+@keyframes edit-row-in {
+  from {
+    border-color: var(--surface-border);
+    opacity: 0.76;
+  }
+
+  to {
+    border-color: var(--text);
+    opacity: 1;
+  }
+}
+
+@keyframes edit-field-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes error-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20%,
+  60% {
+    transform: translateX(-5px);
+  }
+
+  40%,
+  80% {
+    transform: translateX(5px);
   }
 }
 
@@ -452,8 +559,12 @@ form {
   }
 
   .custom-engine-form {
-    grid-template-columns: minmax(76px, 0.8fr) minmax(112px, 1fr) minmax(250px, 2fr) minmax(90px, 0.8fr) auto;
+    grid-template-columns: 76px 112px minmax(0, 1fr) 86px 54px;
     gap: 8px;
+  }
+
+  .add-engine-button {
+    width: 54px;
   }
 
   .custom-engine-row {
@@ -472,12 +583,28 @@ form {
   }
 }
 
+@media (max-height: 680px) {
+  body.panel-visible {
+    --font-size: 42px;
+  }
+
+  body.panel-visible .shell {
+    align-items: flex-start;
+    padding-top: 16px;
+  }
+
+  body.panel-visible .input-wrapper {
+    height: 96px;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   body:not(.light-forced) {
     --bg: #09090b;
+    --bg-translucent: rgba(9, 9, 11, 0.85);
     --text: #f0f0f0;
     --muted: #a1a1aa;
-    --ghost: #63636b;
+    --ghost: #80808a;
     --surface-border: rgba(255, 255, 255, 0.14);
     --field-bg: rgba(255, 255, 255, 0.035);
     --danger: #ff8a80;

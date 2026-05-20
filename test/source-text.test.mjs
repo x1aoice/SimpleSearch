@@ -23,7 +23,6 @@ test('keeps localized UI text wired through readable source files', async () => 
     assert.match(html, /data-i18n="urlTemplateLabel"/);
     assert.match(html, /data-i18n="color"/);
     assert.match(app, /textContent = t\('edit'/);
-    assert.match(app, /textContent = t\('add'/);
     assert.match(app, /value\.slice\(0, cursorIndex\)/);
     assert.match(app, /style\.setProperty\('--caret-x'/);
     assert.match(app, /navigateFromInput\(event\.shiftKey\)/);

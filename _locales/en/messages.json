@@ -83,14 +83,6 @@
       }
     }
   },
-  "editingEngine": {
-    "message": "Editing /$key$",
-    "placeholders": {
-      "key": {
-        "content": "$1"
-      }
-    }
-  },
   "commandOpenHelp": {
     "message": "Open help"
   },

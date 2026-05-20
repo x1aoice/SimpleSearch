@@ -18,7 +18,6 @@ test('uses extension i18n messages when Chrome provides them', () => {
             getUILanguage: () => 'zh-CN',
             getMessage: (key, substitutions = []) => {
                 if (key === 'search') return '搜索';
-                if (key === 'editingEngine') return `正在编辑 /${substitutions[0]}`;
                 return '';
             },
         },
@@ -26,7 +25,6 @@ test('uses extension i18n messages when Chrome provides them', () => {
 
     try {
         assert.equal(t('search'), '搜索');
-        assert.equal(t('editingEngine', ['docs']), '正在编辑 /docs');
     } finally {
         globalThis.chrome = previousChrome;
     }
@@ -43,7 +41,6 @@ test('uses readable Chinese fallback messages', () => {
 
     try {
         assert.equal(t('search'), '搜索');
-        assert.equal(t('editingEngine', ['docs']), '正在编辑 /docs');
         assert.equal(t('customEngineCommandInvalid'), '命令只能使用 1-16 个字母或数字。');
     } finally {
         globalThis.chrome = previousChrome;
