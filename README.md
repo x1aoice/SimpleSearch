@@ -92,8 +92,13 @@ Store listing copy, privacy answers, and asset notes are in `docs/store-listing.
 ```text
 SimpleSearch/
 |-- .editorconfig
+|-- .gitignore
+|-- LICENSE
+|-- PRIVACY.md
+|-- README.md
 |-- index.html
 |-- manifest.json
+|-- package.json
 |-- _locales/
 |-- docs/
 |-- styles.css
@@ -141,4 +146,4 @@ npm test
 
 ## License
 
-SimpleSearch is licensed under the GPL-3.0-only license. See `LICENSE` for details.
+SimpleSearch is licensed under the GNU General Public License v3.0 only. See `LICENSE` for details.
