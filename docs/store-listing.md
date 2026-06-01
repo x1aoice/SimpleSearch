@@ -78,5 +78,4 @@ Open a new tab. Type a search query and press Enter to search with the browser's
 
 - Extension ZIP: `dist/SimpleSearch-1.0.2.zip`
 - Extension icon: included in the ZIP at `icons/icon-128.png`
-- Screenshot: start with `store-assets/screenshot-new-tab-1280x800.png` and replace with a real Chrome screenshot before final submission if the UI changes.
-- Small promotional image: `store-assets/promo-small-440x280.png`
+- Store screenshots and promotional images are kept as local private assets and are not tracked in this repository.

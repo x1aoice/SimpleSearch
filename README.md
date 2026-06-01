@@ -100,7 +100,6 @@ SimpleSearch/
 |-- favicon.svg
 |-- icons/
 |-- scripts/
-|-- store-assets/
 |-- src/
 |   |-- app.js
 |   |-- commands.js
@@ -139,3 +138,7 @@ Run tests:
 ```powershell
 npm test
 ```
+
+## License
+
+SimpleSearch is licensed under the GPL-3.0-only license. See `LICENSE` for details.
