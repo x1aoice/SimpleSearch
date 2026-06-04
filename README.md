@@ -1,7 +1,5 @@
 # SimpleSearch
 
-[![CI](https://github.com/x1aoice/SimpleSearch/actions/workflows/ci.yml/badge.svg)](https://github.com/x1aoice/SimpleSearch/actions/workflows/ci.yml)
-
 SimpleSearch is a minimalist desktop search launcher. It keeps the page quiet: type, press Enter, and move on.
 
 It can also run as a Chrome/Edge new tab extension.
