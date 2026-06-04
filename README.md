@@ -1,8 +1,12 @@
 # SimpleSearch
 
+[![CI](https://github.com/x1aoice/SimpleSearch/actions/workflows/ci.yml/badge.svg)](https://github.com/x1aoice/SimpleSearch/actions/workflows/ci.yml)
+
 SimpleSearch is a minimalist desktop search launcher. It keeps the page quiet: type, press Enter, and move on.
 
 It can also run as a Chrome/Edge new tab extension.
+
+![SimpleSearch preview](docs/assets/simplesearch-preview.png)
 
 ## Features
 
@@ -79,7 +83,7 @@ Then upload:
 dist/SimpleSearch-1.0.2.zip
 ```
 
-Store listing copy, privacy answers, and asset notes are in `docs/store-listing.md`. The privacy policy draft is in `PRIVACY.md`.
+Store listing copy and privacy answers are in `docs/store-listing.md`. The privacy policy draft is in `PRIVACY.md`.
 
 ## Shortcuts
 
@@ -91,6 +95,7 @@ Store listing copy, privacy answers, and asset notes are in `docs/store-listing.
 
 ```text
 SimpleSearch/
+|-- .github/
 |-- .editorconfig
 |-- .gitignore
 |-- LICENSE

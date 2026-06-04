@@ -1,13 +1,14 @@
 {
   "name": "simplesearch",
   "version": "1.0.2",
+  "description": "A minimalist terminal-style new tab search launcher.",
   "private": true,
   "license": "GPL-3.0-only",
   "type": "module",
   "scripts": {
     "test": "node --test",
     "validate:extension": "node scripts/validate-extension.mjs",
-    "package:extension": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package-extension.ps1",
+    "package:extension": "node scripts/package-extension.mjs",
     "verify": "node --test && node scripts/validate-extension.mjs"
   }
 }
