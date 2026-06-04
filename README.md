@@ -1,26 +1,26 @@
 # SimpleSearch
 
-SimpleSearch is a minimalist desktop search launcher. It keeps the page quiet: type, press Enter, and move on.
+A minimalist terminal-style search launcher for your new tab page.
 
-It can also run as a Chrome/Edge new tab extension.
+SimpleSearch replaces the new tab page with a quiet, keyboard-first search box. Type a query and press Enter to search, or use slash commands to search with a specific engine.
 
 ![SimpleSearch preview](docs/assets/simplesearch-preview.png)
 
 ## Features
 
-- Plain searches use the browser's default search engine through Chrome Search API.
-- Slash commands can run one-off searches with Google, Baidu, Bing, GitHub, DuckDuckGo, or custom engines.
-- Automatic English/Chinese UI based on the browser language.
+- Keyboard-first new tab search.
+- Normal searches use the browser's configured default search engine through Chrome Search API.
+- One-shot search commands for Google, Baidu, Bing, GitHub, DuckDuckGo, and custom engines.
+- Custom search engines with `%s` URL templates, editing, deletion, and custom flash colors.
 - Direct URL, domain, IP, and localhost navigation.
-- `Shift+Enter` to force search when an IP or domain should be searched instead of opened.
+- `Shift+Enter` to force search when a URL-like input should be searched instead of opened.
+- English and Simplified Chinese UI based on the browser language.
 - System, light, and dark themes.
-- Built-in `/help` panel.
-- Built-in `/add` panel for custom search engines.
-- Custom search engines with `%s` URL templates, editing, and deletion.
+- No background script, no remote code, and no host permissions.
 
 ## Commands
 
-Type a command and press Space to use that engine once, or type a command and search text together.
+Type a command and press Space to arm it for the next search.
 
 | Command | Action |
 | --- | --- |
@@ -29,16 +29,16 @@ Type a command and press Space to use that engine once, or type a command and se
 | `/bi` | Bing |
 | `/gh` | GitHub |
 | `/dg` | DuckDuckGo |
-| `/dark` | Dark theme |
-| `/light` | Light theme |
 | `/help` | Open help |
 | `/add` | Add custom search engines |
+| `/dark` | Dark theme |
+| `/light` | Light theme |
 
-Slash text is still searchable. For example, `/b` + Enter searches `/b`; only `/b` + Space runs the command. Commands do not change or save the browser's default search engine.
+Slash text remains searchable. For example, `/b` + Enter searches `/b`; only `/b` + Space runs the command.
 
 ## Custom Search Engines
 
-Open `/add`, then add a command, name, and URL template. Use `%s` where the typed search text should go. If the protocol is omitted, SimpleSearch saves it with `https://`.
+Open `/add`, then add a command, name, URL template, and optional color. Use `%s` where the search text should go. If the protocol is omitted, SimpleSearch saves the URL with `https://`.
 
 ```text
 Command: mdn
@@ -46,104 +46,39 @@ Name: MDN
 URL: https://developer.mozilla.org/search?q=%s
 ```
 
-Then use it like:
+Then search with:
 
 ```text
 /mdn array map
 ```
 
-You can also type `/mdn`, press Space, then enter the search text. Use the edit button in settings to update a custom engine's name, URL, or flash color. Delete removes it from the local configuration.
-
 ## Browser Extension
 
-SimpleSearch ships as a Manifest V3 new tab extension with the `search` permission so normal searches can use the browser's configured default search engine.
-The extension uses Chrome's built-in `_locales` system, so Chrome/Edge will choose English or Simplified Chinese automatically from the browser language.
+SimpleSearch is a Manifest V3 new tab extension. It uses the `search` permission so normal searches can respect the browser's configured default search engine.
 
-To load it in Chrome or Edge:
+To load it locally:
 
 1. Open `chrome://extensions` or `edge://extensions`.
 2. Enable developer mode.
 3. Choose `Load unpacked`.
 4. Select this project folder.
 
-After loading, opening a new tab will show SimpleSearch.
+Opening a new tab will show SimpleSearch.
 
-To create a Chrome Web Store upload ZIP:
+To create a local extension ZIP:
 
-```powershell
-npm run verify
+```sh
 npm run package:extension
 ```
 
-Then upload:
-
-```text
-dist/SimpleSearch-1.0.2.zip
-```
-
-Store listing copy and privacy answers are in `docs/store-listing.md`. The privacy policy draft is in `PRIVACY.md`.
-
-## Shortcuts
-
-| Shortcut | Action |
-| --- | --- |
-| Shift+Enter | Force search the current input |
-
-## Project Structure
-
-```text
-SimpleSearch/
-|-- .editorconfig
-|-- .gitignore
-|-- LICENSE
-|-- PRIVACY.md
-|-- README.md
-|-- index.html
-|-- manifest.json
-|-- package.json
-|-- _locales/
-|-- docs/
-|-- styles.css
-|-- favicon.svg
-|-- icons/
-|-- scripts/
-|-- src/
-|   |-- app.js
-|   |-- commands.js
-|   |-- config.js
-|   |-- custom-engines.js
-|   |-- i18n.js
-|   |-- search.js
-|   |-- storage.js
-|   `-- url.js
-`-- test/
-    |-- commands.test.mjs
-    |-- custom-engines.test.mjs
-    |-- extension.test.mjs
-    |-- i18n.test.mjs
-    |-- search.test.mjs
-    |-- source-text.test.mjs
-    `-- url.test.mjs
-```
+The generated package is written to `dist/`.
 
 ## Development
 
-The app is static and has no runtime dependencies. Because it uses ES modules, serve it through a local static server instead of opening `index.html` directly from disk.
+Run the tests and extension checks:
 
 ```powershell
-npx http-server . -p 4173
-```
-
-Then open:
-
-```text
-http://127.0.0.1:4173/
-```
-
-Run tests:
-
-```powershell
-npm test
+npm run verify
 ```
 
 ## License
