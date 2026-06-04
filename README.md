@@ -93,7 +93,6 @@ Store listing copy and privacy answers are in `docs/store-listing.md`. The priva
 
 ```text
 SimpleSearch/
-|-- .github/
 |-- .editorconfig
 |-- .gitignore
 |-- LICENSE
