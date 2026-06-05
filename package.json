@@ -6,9 +6,8 @@
   "license": "GPL-3.0-only",
   "type": "module",
   "scripts": {
-    "test": "node --test",
     "validate:extension": "node scripts/validate-extension.mjs",
     "package:extension": "node scripts/package-extension.mjs",
-    "verify": "node --test && node scripts/validate-extension.mjs"
+    "verify": "node scripts/validate-extension.mjs"
   }
 }

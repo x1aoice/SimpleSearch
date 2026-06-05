@@ -51,7 +51,7 @@ const sources = await Promise.all(
 assert.doesNotMatch(sources.join('\n'), /<script(?! type="module" src="src\/app\.js"><\/script>)/i);
 assert.doesNotMatch(sources.join('\n'), /https:\/\/cdn\.|http:\/\/cdn\.|unsafe-eval|unsafe-inline/i);
 
-console.log(`Extension manifest is publish-ready: SimpleSearch ${manifest.version}`);
+console.log(`Extension manifest is valid: SimpleSearch ${manifest.version}`);
 
 async function readJson(file) {
     return JSON.parse(await readFile(new URL(file, root), 'utf8'));

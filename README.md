@@ -75,7 +75,7 @@ The generated package is written to `dist/`.
 
 ## Development
 
-Run the tests and extension checks:
+Run the extension checks:
 
 ```powershell
 npm run verify
